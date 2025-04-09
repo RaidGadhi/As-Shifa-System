@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Doctor Appointments</title>
+  <link rel="stylesheet" href="appointments_doctor.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background overlay -->
+  <div class="background-overlay"></div>
+
+  <!-- Main Glass Panel -->
+  <div class="glass-panel" id="appointmentsContainer">
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Manage Appointments</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Upcoming Appointments Section -->
+    <section class="appointments-section">
+      <h2>Upcoming Appointments</h2>
+      <p class="intro-text">Review your scheduled patient visits below.</p>
+
+      <table id="appointmentsTable">
+        <thead>
+          <tr>
+            <th>Date &amp; Time</th>
+            <th>Patient</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by appointments_doctor.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Availability / New Slots Section -->
+    <section class="availability-section">
+      <h2>Adjust Availability</h2>
+      <p class="intro-text">Add or remove available slots so patients can schedule appointments.</p>
+
+      <form id="availabilityForm">
+        <div class="input-row">
+          <label for="availDateTime">Date &amp; Time</label>
+          <input type="datetime-local" id="availDateTime" required />
+        </div>
+
+        <button type="submit" class="btn">Add Availability</button>
+      </form>
+
+      <ul id="availabilityList">
+        <!-- Populated by appointments_doctor.js -->
+      </ul>
+    </section>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="appointments_doctor.js"></script>
+</body>
+</html>

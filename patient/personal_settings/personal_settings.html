@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Personal Settings</title>
+  <link rel="stylesheet" href="personal_settings.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background -->
+  <div class="background-overlay"></div>
+
+  <!-- Glass panel container -->
+  <div class="glass-panel" id="settingsContainer">
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Personal Settings</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Profile Information Section -->
+    <section class="profile-section">
+      <h2>My Profile</h2>
+      <p class="intro-text">Update your personal details below.</p>
+
+      <form id="profileForm">
+        <div class="input-row">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" required />
+        </div>
+
+        <div class="input-row">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required />
+        </div>
+
+        <div class="input-row">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" />
+        </div>
+
+        <button type="submit" class="btn">Save Changes</button>
+      </form>
+    </section>
+
+    <!-- Password Change Section -->
+    <section class="password-section">
+      <h2>Change Password</h2>
+      <p class="intro-text">Use a strong password to protect your account.</p>
+
+      <form id="passwordForm">
+        <div class="input-row">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" required />
+        </div>
+
+        <div class="input-row">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" required />
+        </div>
+
+        <div class="input-row">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" required />
+        </div>
+
+        <button type="submit" class="btn">Update Password</button>
+      </form>
+    </section>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="personal_settings.js"></script>
+</body>
+</html>

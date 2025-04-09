@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - My Medical Records</title>
+  <link rel="stylesheet" href="my_medical_records.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background overlay -->
+  <div class="background-overlay"></div>
+
+  <!-- Main Container (glass style) -->
+  <div class="glass-panel" id="recordsContainer">
+    <!-- Header Section -->
+    <header class="header-bar">
+      <h1>My Medical Records</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Table / Records Section -->
+    <section class="records-section">
+      <h2>Medical Records</h2>
+      <p class="intro-text">Below is a summary of your recent diagnoses, lab results, and prescriptions.</p>
+
+      <!-- Table of records -->
+      <table id="recordsTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Doctor</th>
+            <th>Diagnosis</th>
+            <th>Prescriptions</th>
+            <th>Lab Results</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled dynamically by my_medical_records.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Info / Error Messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="my_medical_records.js"></script>
+</body>
+</html>

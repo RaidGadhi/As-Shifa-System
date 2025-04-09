@@ -1,0 +1,336 @@
+/*
+  index.css
+  A more advanced, "real dashboard" style design
+  with top nav, swirling background, and glass container
+*/
+
+/* RESET & BASE FONT */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Nunito", sans-serif;
+  }
+  
+  /* BODY */
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #141E30, #243B55);
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  /* SWIRLING BACKGROUND OVERLAY */
+  .background-overlay {
+    position: fixed;
+    width: 300%;
+    height: 300%;
+    top: -100%;
+    left: -100%;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 70%
+    );
+    animation: swirl 20s infinite linear;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  @keyframes swirl {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* NAVIGATION BAR */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    z-index: 2;
+  }
+  
+  /* NAV LEFT: BRAND */
+  .nav-left .brand {
+    color: #fff;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+  
+  /* NAV CENTER: SAMPLE MENU */
+  .nav-center {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .nav-center li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+  }
+  
+  .nav-center li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* NAV RIGHT: GREETING + LOGOUT */
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  /* The text that shows the role or greeting */
+  #roleGreeting {
+    color: #fff;
+    font-size: 0.95rem;
+    margin-right: 0.5rem;
+  }
+  
+  /* LOGOUT BUTTON STYLING (reusing .btn styles) */
+  .btn {
+    background-color: #2b90d9;
+    color: #fff;
+    border: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  /* Outline button style for logout or secondary */
+  .btn.outline {
+    background-color: transparent;
+    color: #2b90d9;
+    border: 2px solid #2b90d9;
+  }
+  
+  .btn.outline:hover {
+    background-color: #2b90d9;
+    color: #fff;
+  }
+  
+  .btn:hover {
+    background-color: #0077cc;
+    transform: translateY(-2px);
+  }
+  
+  .btn:active {
+    transform: scale(0.98);
+  }
+  
+  /* GLASSY DASHBOARD CONTAINER */
+  .glass-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    width: 90%;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 15px;
+  
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  
+    animation: fadeInUp 0.8s ease forwards;
+    transform: translateY(20px);
+    opacity: 0;
+  
+    color: #222; 
+  }
+  
+  /* Fade in animation */
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0px);
+    }
+  }
+  
+  /* DASHBOARD HEADER */
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 1.8rem;
+    color: #2b90d9;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dashboard-header p {
+    color: #444;
+    font-size: 1rem;
+  }
+  
+  /* ROLE PANELS */
+  .role-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  /* Each card in the panel */
+  .card {
+    flex: 1 1 250px;
+    background-color: #fdfdfd;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 1rem;
+    min-width: 220px;
+    max-width: 300px;
+    text-align: left;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card h3 {
+    color: #0077cc;
+    margin-bottom: 0.5rem;
+  }
+  
+  .card p {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.4;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* RESPONSIVE DESIGN */
+  @media (max-width: 768px) {
+    .role-panel {
+      flex-direction: column;
+      align-items: center;
+    }
+    .card {
+      width: 80%;
+      max-width: none;
+    }
+  }
+  
+  /* For smaller screens, nav becomes stacked */
+  @media (max-width: 480px) {
+    .top-nav {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 0.5rem 1rem;
+    }
+    .nav-center {
+      width: 100%;
+      justify-content: center;
+      margin: 0.5rem 0;
+    }
+    .nav-right {
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+    .brand {
+      font-size: 1.2rem;
+    }
+  }
+
+  /* Remove underline & keep text color for .card links */
+.role-panel a.card {
+    text-decoration: none;
+    color: inherit; /* So it doesn't change to link color */
+    cursor: pointer; /* Ensures it looks clickable on hover */
+  }
+  
+  /* On hover, still remove text-decoration and keep your card animations */
+  .role-panel a.card:hover,
+  .role-panel a.card:focus {
+    text-decoration: none;
+    /* You can also manipulate box-shadow or background here if you want a stronger effect */
+  }
+  /*
+  index.css (Partially repeated)
+  Additional styles for pop-up modals (Profile & Help)
+*/
+
+/* ... existing swirling background, .glass-container, top-nav, .btn, etc. ... */
+
+/* MODAL OVERLAY & CONTENT */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; /* above everything else */
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 500px;
+  padding: 1.5rem;
+  border-radius: 10px;
+  position: relative;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Close Button (top-right corner) */
+.close-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 1rem;
+  font-size: 1.4rem;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #c0392b;
+}
+
+  

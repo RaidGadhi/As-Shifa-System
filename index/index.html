@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Dashboard</title>
+  <link rel="stylesheet" href="index.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling gradient background -->
+  <div class="background-overlay"></div>
+
+  <!-- NAVIGATION BAR -->
+  <nav class="top-nav">
+    <!-- Brand / Logo -->
+    <div class="nav-left">
+      <h2 class="brand">As-Shifa</h2>
+    </div>
+
+    <!-- Nav Center -->
+    <ul class="nav-center">
+      <li><a href="#" id="homeLink">Home</a></li>
+      <li><a href="#" id="profileLink">Profile</a></li>
+      <li><a href="#" id="helpLink">Help</a></li>
+    </ul>
+
+    <!-- Nav Right: greeting + logout -->
+    <div class="nav-right">
+      <p id="roleGreeting"></p>
+      <button class="btn outline" id="logoutButton">Logout</button>
+    </div>
+  </nav>
+
+  <!-- MAIN DASHBOARD CONTAINER (glass effect) -->
+  <div class="glass-container" id="dashboardContainer">
+    <!-- Title / Subtitle for the user -->
+    <header class="dashboard-header">
+      <h1 id="welcomeMessage"></h1>
+      <p id="roleDescription"></p>
+    </header>
+
+    <!-- Doctor Dashboard -->
+    <section class="role-panel" id="doctorSection" style="display: none;">
+      <a class="card" href="../doctor/medical_records/medical_records.html">
+        <h3>Medical Records</h3>
+        <p>View &amp; update patient diagnoses, lab results, and more.</p>
+      </a>
+      <a class="card" href="../doctor/prescriptions/prescriptions.html">
+        <h3>Prescriptions</h3>
+        <p>Issue new prescriptions, refill existing ones, and manage pharmacy requests.</p>
+      </a>
+      <a class="card" href="../doctor/appointments_doctor/appointments_doctor.html">
+        <h3>Appointments</h3>
+        <p>Check upcoming appointments, adjust availability, and manage scheduling conflicts.</p>
+      </a>
+      <a class="card" href="../doctor/analytics/analytics.html">
+        <h3>Analytics</h3>
+        <p>Access advanced patient analytics, trends, and performance charts.</p>
+      </a>
+    </section>
+
+    <!-- Staff Dashboard -->
+    <section class="role-panel" id="staffSection" style="display: none;">
+      <a class="card" href="../staff/scheduling/scheduling.html">
+        <h3>Scheduling</h3>
+        <p>Manage patient appointments, doctor availability, and handle scheduling requests.</p>
+      </a>
+      <a class="card" href="../staff/patient_vitals/patient_vitals.html">
+        <h3>Patient Vitals</h3>
+        <p>Update and maintain patient vitals, test results, and initial check-ins.</p>
+      </a>
+      <a class="card" href="../staff/insurance_billing/insurance_billing.html">
+        <h3>Insurance &amp; Billing</h3>
+        <p>Coordinate with insurance providers, submit claims, and track billing statuses.</p>
+      </a>
+      <a class="card" href="../staff/lab_reports/lab_reports.html">
+        <h3>Lab Reports</h3>
+        <p>Assist with lab samples, uploading results, and ensuring data integrity.</p>
+      </a>
+    </section>
+
+    <!-- Patient Dashboard -->
+    <section class="role-panel" id="patientSection" style="display: none;">
+      <a class="card" href="../patient/my_medical_records/my_medical_records.html">
+        <h3>My Medical Records</h3>
+        <p>View personal diagnoses, prescriptions, and lab results.</p>
+      </a>
+      <a class="card" href="../patient/appointments_patient/appointments_patient.html">
+        <h3>Appointments</h3>
+        <p>Book new appointments, modify or cancel existing ones.</p>
+      </a>
+      <a class="card" href="../patient/prescription_refills/prescription_refills.html">
+        <h3>Prescription Refills</h3>
+        <p>Request refills for existing prescriptions online.</p>
+      </a>
+      <a class="card" href="../patient/personal_settings/personal_settings.html">
+        <h3>Personal Settings</h3>
+        <p>Update personal info, change password, and manage account security.</p>
+      </a>
+    </section>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal-overlay" id="profileModal" style="display: none;">
+    <div class="modal-content">
+      <span class="close-btn" id="closeProfileModal">&times;</span>
+      <h2>Profile Information</h2>
+      <p>This is a sample pop-up to show some user profile details or links. You can manage more advanced settings within your role-based pages (e.g., "Personal Settings" if you are a patient).</p>
+      <p>For demonstration only.</p>
+    </div>
+  </div>
+
+  <!-- HELP MODAL -->
+  <div class="modal-overlay" id="helpModal" style="display: none;">
+    <div class="modal-content">
+      <span class="close-btn" id="closeHelpModal">&times;</span>
+      <h2>Help &amp; Support</h2>
+      <p>Need assistance? Contact our support team or refer to the relevant role-based documentation. This is a placeholder pop-up for demonstration purposes.</p>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

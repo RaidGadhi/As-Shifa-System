@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Appointments</title>
+  <link rel="stylesheet" href="appointments_patient.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background -->
+  <div class="background-overlay"></div>
+
+  <!-- Glass panel container -->
+  <div class="glass-panel" id="appointmentsContainer">
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>My Appointments</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Existing Appointments Section -->
+    <section class="appointment-section">
+      <h2>Upcoming Appointments</h2>
+      <p class="intro-text">View your scheduled visits and manage them below.</p>
+
+      <table id="appointmentsTable">
+        <thead>
+          <tr>
+            <th>Date &amp; Time</th>
+            <th>Doctor</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled dynamically by appointments_patient.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Book New Appointment Form -->
+    <section class="booking-section">
+      <h2>Book a New Appointment</h2>
+      <p class="intro-text">Select a date/time and choose a doctor from the list.</p>
+
+      <form id="bookingForm">
+        <div class="input-row">
+          <label for="appointmentDate">Date &amp; Time</label>
+          <input type="datetime-local" id="appointmentDate" required />
+        </div>
+
+        <div class="input-row">
+          <label for="doctorSelect">Doctor</label>
+          <select id="doctorSelect" required>
+            <!-- Populated by JS or you can hardcode -->
+          </select>
+        </div>
+
+        <button type="submit" class="btn">Request Appointment</button>
+      </form>
+    </section>
+
+    <!-- Info/Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="appointments_patient.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Lab Reports</title>
+  <link rel="stylesheet" href="lab_reports.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background overlay -->
+  <div class="background-overlay"></div>
+
+  <!-- Main Glass Container -->
+  <div class="glass-panel" id="labReportsContainer">
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Manage Lab Reports</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Existing Reports Table -->
+    <section class="reports-section">
+      <h2>Existing Lab Reports</h2>
+      <p class="intro-text">Review and update existing lab results for patients.</p>
+
+      <table id="reportsTable">
+        <thead>
+          <tr>
+            <th>Report ID</th>
+            <th>Patient</th>
+            <th>Test Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by lab_reports.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- New Report Section -->
+    <section class="new-report-section">
+      <h2>Upload New Report</h2>
+      <p class="intro-text">Add a new lab report for a patient by uploading test results.</p>
+
+      <form id="newReportForm">
+        <div class="input-row">
+          <label for="patientName">Patient Name</label>
+          <input type="text" id="patientName" required placeholder="e.g. John Doe" />
+        </div>
+
+        <div class="input-row">
+          <label for="testType">Test Type</label>
+          <input type="text" id="testType" required placeholder="e.g. Blood Test" />
+        </div>
+
+        <div class="input-row">
+          <label for="fileInput">Test Results File (Mock)</label>
+          <input type="file" id="fileInput" />
+        </div>
+
+        <button type="submit" class="btn">Submit Report</button>
+      </form>
+    </section>
+
+    <!-- Info / Error Messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="lab_reports.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Insurance &amp; Billing</title>
+  <link rel="stylesheet" href="insurance_billing.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background overlay -->
+  <div class="background-overlay"></div>
+
+  <!-- Main Glass Container -->
+  <div class="glass-panel" id="billingContainer">
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Insurance &amp; Billing</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Claims Table -->
+    <section class="claims-section">
+      <h2>Insurance Claims</h2>
+      <p class="intro-text">View, submit, and update insurance claims. All data below is mocked for demonstration.</p>
+
+      <table id="claimsTable">
+        <thead>
+          <tr>
+            <th>Claim ID</th>
+            <th>Patient</th>
+            <th>Provider</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled by insurance_billing.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- New Claim Form -->
+    <section class="new-claim-section">
+      <h2>Submit a New Claim</h2>
+      <p class="intro-text">Complete the form to submit a new insurance claim.</p>
+
+      <form id="newClaimForm">
+        <div class="input-row">
+          <label for="patientName">Patient Name</label>
+          <input type="text" id="patientName" required placeholder="e.g. John Doe" />
+        </div>
+
+        <div class="input-row">
+          <label for="provider">Insurance Provider</label>
+          <input type="text" id="provider" required placeholder="e.g. SaudiCare" />
+        </div>
+
+        <div class="input-row">
+          <label for="claimAmount">Claim Amount (SAR)</label>
+          <input type="number" id="claimAmount" required min="0" />
+        </div>
+
+        <div class="input-row">
+          <label for="description">Claim Description</label>
+          <textarea id="description" rows="3" required placeholder="e.g. coverage for X procedure"></textarea>
+        </div>
+
+        <button type="submit" class="btn">Submit Claim</button>
+      </form>
+    </section>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="insurance_billing.js"></script>
+</body>
+</html>

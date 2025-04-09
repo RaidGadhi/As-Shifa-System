@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Doctor Prescriptions</title>
+  <link rel="stylesheet" href="prescriptions.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background -->
+  <div class="background-overlay"></div>
+
+  <!-- Glass panel container -->
+  <div class="glass-panel" id="prescriptionsContainer">
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Manage Prescriptions</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Prescriptions Listing -->
+    <section class="prescriptions-list-section">
+      <h2>Existing Prescriptions</h2>
+      <p class="intro-text">Review and update active prescriptions for your patients.</p>
+
+      <table id="prescriptionsTable">
+        <thead>
+          <tr>
+            <th>Prescription ID</th>
+            <th>Patient Name</th>
+            <th>Medication</th>
+            <th>Dosage</th>
+            <th>Refills Left</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by prescriptions.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Create New Prescription -->
+    <section class="create-prescription-section">
+      <h2>Create a New Prescription</h2>
+      <p class="intro-text">Assign a medication to a patient, specify dosage and refills.</p>
+
+      <form id="newPrescriptionForm">
+        <div class="input-row">
+          <label for="patientName">Patient Name</label>
+          <input type="text" id="patientName" required placeholder="e.g. John Doe" />
+        </div>
+
+        <div class="input-row">
+          <label for="medication">Medication</label>
+          <input type="text" id="medication" required placeholder="e.g. Metformin" />
+        </div>
+
+        <div class="input-row">
+          <label for="dosage">Dosage</label>
+          <input type="text" id="dosage" required placeholder="e.g. 500mg" />
+        </div>
+
+        <div class="input-row">
+          <label for="refills">Refills Left</label>
+          <input type="number" id="refills" required min="0" value="0" />
+        </div>
+
+        <button type="submit" class="btn">Create Prescription</button>
+      </form>
+    </section>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="prescriptions.js"></script>
+</body>
+</html>

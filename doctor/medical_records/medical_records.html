@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Doctor Medical Records</title>
+  <link rel="stylesheet" href="medical_records.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background -->
+  <div class="background-overlay"></div>
+
+  <!-- Glass panel container -->
+  <div class="glass-panel" id="recordsContainer">
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Manage Medical Records</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Search / Filter Section -->
+    <section class="search-section">
+      <h2>Search Patient Records</h2>
+      <p class="intro-text">Find a patient record by ID or name and update as needed.</p>
+
+      <form id="searchForm">
+        <div class="input-row">
+          <label for="patientSearch">Patient ID / Name</label>
+          <input type="text" id="patientSearch" placeholder="e.g., 12345 or John Doe" required />
+        </div>
+        <button type="submit" class="btn">Search</button>
+      </form>
+    </section>
+
+    <!-- Results Table -->
+    <section class="results-section">
+      <h2>Patient Records</h2>
+      <p class="intro-text">Select a record to edit the diagnosis, prescriptions, or lab results.</p>
+
+      <table id="recordsTable">
+        <thead>
+          <tr>
+            <th>Patient ID</th>
+            <th>Patient Name</th>
+            <th>Diagnosis</th>
+            <th>Prescriptions</th>
+            <th>Lab Results</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by medical_records.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Edit Modal (Diagnosis, Prescriptions, Lab) -->
+    <div class="modal-overlay" id="editModal" style="display: none;">
+      <div class="modal-content">
+        <span class="close-btn" id="closeEditModal">&times;</span>
+        <h2>Edit Record</h2>
+        <form id="editForm">
+          <div class="input-row">
+            <label for="editDiagnosis">Diagnosis</label>
+            <textarea id="editDiagnosis" rows="2"></textarea>
+          </div>
+          <div class="input-row">
+            <label for="editPrescriptions">Prescriptions</label>
+            <textarea id="editPrescriptions" rows="2"></textarea>
+          </div>
+          <div class="input-row">
+            <label for="editLabResults">Lab Results</label>
+            <textarea id="editLabResults" rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn">Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+
+  </div>
+
+  <script src="medical_records.js"></script>
+</body>
+</html>

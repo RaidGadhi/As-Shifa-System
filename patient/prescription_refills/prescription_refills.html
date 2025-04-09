@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Prescription Refills</title>
+  <link rel="stylesheet" href="prescription_refills.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background -->
+  <div class="background-overlay"></div>
+
+  <!-- Glass panel container -->
+  <div class="glass-panel" id="refillsContainer">
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Prescription Refills</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Active Prescriptions Table -->
+    <section class="prescription-section">
+      <h2>Active Prescriptions</h2>
+      <p class="intro-text">Below are your current prescriptions. Request a refill if needed.</p>
+
+      <table id="prescriptionsTable">
+        <thead>
+          <tr>
+            <th>Medication</th>
+            <th>Dosage</th>
+            <th>Remaining Refills</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled dynamically by prescription_refills.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Refill Request Section -->
+    <section class="request-section">
+      <h2>Request a New Refill</h2>
+      <p class="intro-text">Select from your active prescriptions to request a refill.</p>
+
+      <form id="refillForm">
+        <div class="input-row">
+          <label for="medicationSelect">Medication</label>
+          <select id="medicationSelect" required>
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <div class="input-row">
+          <label for="comments">Additional Comments (Optional)</label>
+          <textarea id="comments" rows="3" placeholder="e.g., experiencing side effects..."></textarea>
+        </div>
+
+        <button type="submit" class="btn">Submit Refill Request</button>
+      </form>
+    </section>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="prescription_refills.js"></script>
+</body>
+</html>

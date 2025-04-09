@@ -1,0 +1,212 @@
+/*
+  login.css
+  Updated to fix potential refresh/glitch issues:
+  - Removes body overflow: hidden
+  - Removes position: relative on <body>
+  - Slightly shorter fadeInUp
+*/
+
+/* Basic reset & font */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Nunito", sans-serif;
+}
+
+/* Body: dark gradient for strong contrast */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #141E30, #243B55);
+
+  /* Instead of hidden, allow vertical scrolling if needed */
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  /* Center the glass panel */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Swirling radial overlay for a dynamic background effect */
+.background-overlay {
+  position: absolute;
+  width: 300%;
+  height: 300%;
+  top: -100%;
+  left: -100%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 70%
+  );
+  animation: swirl 20s infinite linear;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes swirl {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glass panel container */
+.glass-panel {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.8); 
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  text-align: center;
+
+  /* Slightly shorter fade to reduce flicker */
+  animation: fadeInUp 0.7s ease forwards;
+  transform: translateY(20px);
+  opacity: 0;
+
+  color: #222; /* Dark text for readability on bright background */
+}
+
+/* Titles in the login panel */
+.app-title {
+  font-size: 2rem;
+  margin-bottom: 0.3rem;
+  color: #111;
+  letter-spacing: 1px;
+}
+
+.app-subtitle {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+/* Input containers */
+.input-container {
+  margin-bottom: 1rem;
+  text-align: left;
+  color: #222;
+}
+
+.input-container label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: #111;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+  color: #222;
+  background-color: #fdfdfd;
+}
+
+.input-container input:focus {
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Button row */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.2rem;
+}
+
+.btn {
+  background-color: #2b90d9;
+  color: #fff;
+  border: none;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #0077cc;
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Outline (for logout) */
+.btn.outline {
+  background-color: transparent;
+  color: #2b90d9;
+  border: 2px solid #2b90d9;
+}
+
+.btn.outline:hover {
+  background-color: #2b90d9;
+  color: #fff;
+}
+
+/* Error/Info messages */
+.message {
+  margin-top: 1rem;
+  padding: 0.6rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #c0392b;
+}
+
+.info-message {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #444;
+}
+
+/* Lockout attempts info */
+.attempts-info {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Fade In Up (shorter) */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .glass-panel {
+    padding: 1.5rem;
+  }
+  .app-title {
+    font-size: 1.6rem;
+  }
+}

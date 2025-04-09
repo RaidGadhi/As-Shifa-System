@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Staff Scheduling</title>
+  <link rel="stylesheet" href="scheduling.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background -->
+  <div class="background-overlay"></div>
+
+  <!-- Glass panel container -->
+  <div class="glass-panel" id="schedulingContainer">
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Manage Scheduling</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Appointment Requests Section -->
+    <section class="requests-section">
+      <h2>Appointment Requests</h2>
+      <p class="intro-text">
+        Approve or reject patient appointment requests based on doctor availability.
+      </p>
+
+      <table id="requestsTable">
+        <thead>
+          <tr>
+            <th>Date &amp; Time</th>
+            <th>Patient</th>
+            <th>Doctor Requested</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by scheduling.js -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Doctor Availability Section -->
+    <section class="availability-section">
+      <h2>Doctor Availability</h2>
+      <p class="intro-text">
+        Check available slots for each doctor to assist with scheduling.
+      </p>
+
+      <ul id="availabilityList">
+        <!-- Populated by scheduling.js -->
+      </ul>
+    </section>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="scheduling.js"></script>
+</body>
+</html>

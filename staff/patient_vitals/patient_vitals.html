@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As-Shifa - Patient Vitals</title>
+  <link rel="stylesheet" href="patient_vitals.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+  <!-- Swirling background -->
+  <div class="background-overlay"></div>
+
+  <!-- Glass panel container -->
+  <div class="glass-panel" id="vitalsContainer">
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+      <h1>Manage Patient Vitals</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
+    </header>
+
+    <!-- Search / Filter Section -->
+    <section class="search-section">
+      <h2>Search Patient</h2>
+      <p class="intro-text">Enter a patient ID or name to view/update vitals.</p>
+
+      <form id="searchForm">
+        <div class="input-row">
+          <label for="patientSearch">Patient ID / Name</label>
+          <input type="text" id="patientSearch" placeholder="e.g. 12345 or John Doe" required />
+        </div>
+        <button type="submit" class="btn">Search</button>
+      </form>
+    </section>
+
+    <!-- Results / Vitals Section -->
+    <section class="vitals-section">
+      <h2>Patient Vitals</h2>
+      <p class="intro-text">Once you find a patient, record or update the vitals below.</p>
+
+      <form id="vitalsForm">
+        <div class="input-row">
+          <label for="height">Height (cm)</label>
+          <input type="number" id="height" min="0" />
+        </div>
+
+        <div class="input-row">
+          <label for="weight">Weight (kg)</label>
+          <input type="number" id="weight" min="0" />
+        </div>
+
+        <div class="input-row">
+          <label for="bloodPressure">Blood Pressure</label>
+          <input type="text" id="bloodPressure" placeholder="e.g. 120/80" />
+        </div>
+
+        <div class="input-row">
+          <label for="temp">Temperature (°C)</label>
+          <input type="number" id="temp" min="0" max="50" />
+        </div>
+
+        <div class="input-row">
+          <label for="notes">Additional Notes</label>
+          <textarea id="notes" rows="3" placeholder="Symptoms, etc."></textarea>
+        </div>
+
+        <button type="submit" class="btn">Save Vitals</button>
+      </form>
+    </section>
+
+    <!-- Info / Error messages -->
+    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+  </div>
+
+  <script src="patient_vitals.js"></script>
+</body>
+</html>
