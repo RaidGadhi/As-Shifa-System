@@ -1,27 +1,21 @@
-/*
-  appointments_patient.js
-  - Mock data for upcoming appointments
-  - Functions to cancel an appointment or book a new one
-  - "Back to Dashboard" => ../index/index.html?role=patient
-*/
+/* appointments_patient.js */
 
-/** DOM references */
+// DOM references
 const appointmentsTableBody = document.querySelector("#appointmentsTable tbody");
 const bookingForm = document.getElementById("bookingForm");
 const doctorSelect = document.getElementById("doctorSelect");
-
 const backButton = document.getElementById("backButton");
 const infoMessage = document.getElementById("infoMessage");
 const errorMessage = document.getElementById("errorMessage");
 
-/** Example Mock Doctors List */
+// Example Mock Doctors List
 const mockDoctors = [
   { name: "Dr. Abdullah AlQahtani" },
   { name: "Dr. Sarah AlMohanna" },
   { name: "Dr. Samer Aziz" }
 ];
 
-/** Example Mock Appointments */
+// Example Mock Appointments
 let mockAppointments = [
   {
     id: 1,
@@ -37,24 +31,30 @@ let mockAppointments = [
   }
 ];
 
-/** On page load */
 window.onload = () => {
   populateAppointmentsTable();
   populateDoctorSelect();
 
-  // Event listeners
   bookingForm.addEventListener("submit", handleBookingForm);
   backButton.addEventListener("click", () => {
+    // "Meaningful action": user clicked to go back
+    resetInactivityTimer();
     window.location.href = "../../index/index.html?role=patient";
   });
+
+  // (1) For quick testing: ensure isLoggedIn is "true"
+  //    If you have a real login flow, remove this line.
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    localStorage.setItem("isLoggedIn", "true");
+    console.log("For DEMO: forced isLoggedIn=true so inactivity timer runs.");
+  }
 };
 
 /**
- * Populates appointments table with mockAppointments
+ * Populate the appointments table
  */
 function populateAppointmentsTable() {
   appointmentsTableBody.innerHTML = "";
-
   if (mockAppointments.length === 0) {
     displayInfo("No upcoming appointments found.");
     return;
@@ -77,17 +77,21 @@ function populateAppointmentsTable() {
 
     // Actions
     const tdAction = document.createElement("td");
-    // We add some action buttons
     const cancelBtn = document.createElement("button");
     cancelBtn.classList.add("action-btn");
     cancelBtn.textContent = "Cancel";
-    cancelBtn.onclick = () => handleCancelAppointment(appt.id);
+    cancelBtn.onclick = () => {
+      resetInactivityTimer(); // user clicked "Cancel"
+      handleCancelAppointment(appt.id);
+    };
 
-    // Optional: Reschedule button
     const rescheduleBtn = document.createElement("button");
     rescheduleBtn.classList.add("action-btn");
     rescheduleBtn.textContent = "Reschedule";
-    rescheduleBtn.onclick = () => handleRescheduleAppointment(appt.id);
+    rescheduleBtn.onclick = () => {
+      resetInactivityTimer(); // user clicked "Reschedule"
+      handleRescheduleAppointment(appt.id);
+    };
 
     tdAction.appendChild(cancelBtn);
     tdAction.appendChild(rescheduleBtn);
@@ -96,16 +100,14 @@ function populateAppointmentsTable() {
     tr.appendChild(tdDoctor);
     tr.appendChild(tdStatus);
     tr.appendChild(tdAction);
-
     appointmentsTableBody.appendChild(tr);
   });
 }
 
 /**
- * Populates the doctorSelect dropdown
+ * Populate the doctorSelect dropdown
  */
 function populateDoctorSelect() {
-  // Clear existing options
   doctorSelect.innerHTML = "<option value=''>--Select a Doctor--</option>";
   mockDoctors.forEach(doc => {
     const opt = document.createElement("option");
@@ -121,6 +123,8 @@ function populateDoctorSelect() {
 function handleBookingForm(e) {
   e.preventDefault();
 
+  resetInactivityTimer(); // user performed "Book Appointment"
+
   const datetime = document.getElementById("appointmentDate").value;
   const doctor = document.getElementById("doctorSelect").value;
 
@@ -129,7 +133,6 @@ function handleBookingForm(e) {
     return;
   }
 
-  // Create new mock appointment
   const newAppt = {
     id: mockAppointments.length + 1,
     datetime,
@@ -139,24 +142,22 @@ function handleBookingForm(e) {
 
   mockAppointments.push(newAppt);
 
-  displayInfo("Appointment requested! Status: Pending");
+  displayInfo("Appointment requested! Status: Pending.");
   bookingForm.reset();
   populateAppointmentsTable();
 }
 
 /**
- * Cancel an appointment
+ * Cancel appointment
  */
 function handleCancelAppointment(apptId) {
-  // Simple example: remove from array
   mockAppointments = mockAppointments.filter(a => a.id !== apptId);
-  displayInfo("Appointment has been canceled.");
+  displayInfo("Appointment canceled.");
   populateAppointmentsTable();
 }
 
 /**
- * Reschedule an appointment
- *  - For this mock, let's just change the status or show a prompt
+ * Reschedule
  */
 function handleRescheduleAppointment(apptId) {
   const newDateTime = prompt("Enter new date/time (YYYY-MM-DDTHH:mm):", "");
@@ -164,39 +165,32 @@ function handleRescheduleAppointment(apptId) {
     displayError("Reschedule canceled or invalid input.");
     return;
   }
-
-  // Update the appointment in mock data
   const found = mockAppointments.find(a => a.id === apptId);
   if (found) {
     found.datetime = newDateTime;
     found.status = "Pending";
-    displayInfo("Appointment rescheduled to " + formatDateTime(newDateTime) + " (Pending)");
+    displayInfo("Appointment rescheduled to " + formatDateTime(newDateTime) + ".");
     populateAppointmentsTable();
   }
 }
 
 /**
- * Utility: Format date/time for display
+ * Format date/time
  */
 function formatDateTime(dtString) {
-  // Basic example
   const dt = new Date(dtString);
-  if (isNaN(dt.getTime())) return dtString; // fallback if invalid
-  return dt.toLocaleString(); // e.g. "4/15/2025, 10:30:00 AM"
+  if (isNaN(dt.getTime())) return dtString;
+  return dt.toLocaleString();
 }
 
 /**
- * Display info message
+ * Info / Error messages
  */
 function displayInfo(msg) {
   infoMessage.style.display = "block";
   infoMessage.innerText = msg;
   errorMessage.style.display = "none";
 }
-
-/**
- * Display error message
- */
 function displayError(msg) {
   errorMessage.style.display = "block";
   errorMessage.innerText = msg;
