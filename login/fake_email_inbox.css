@@ -1,0 +1,43 @@
+/* --- Basic vibe matches login.css ------------------------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:Nunito,Arial}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#101720;color:#fff;position:relative;overflow:hidden
+}
+
+/* swirling gradient like other pages */
+.background-overlay{
+  position:absolute;inset:0;
+  background:conic-gradient(from 180deg at 50% 50%,#004680 0%,#00568C 30%,#17679D 60%,#004680 100%);
+  animation:bg 20s linear infinite;z-index:-1;filter:blur(80px)
+}
+@keyframes bg{to{transform:rotate(360deg)}}
+
+/* main card */
+.canvas{
+  width:90%;max-width:400px;background:rgba(255,255,255,.06);
+  backdrop-filter:blur(20px);padding:2rem 2.5rem;border-radius:18px;
+  box-shadow:0 10px 32px rgba(0,0,0,.45);text-align:center
+}
+.title{font-weight:700;font-size:1.5rem;margin-bottom:.4rem}
+.subtitle{font-size:.95rem;margin-bottom:1.2rem;color:#d0d0d0}
+
+/* inner card (form + result) */
+.inner-card{
+  background:rgba(0,0,0,.25);padding:1.2rem;border-radius:12px;
+  display:flex;flex-direction:column;gap:.8rem;margin-bottom:1.1rem
+}
+.inner-card input{
+  padding:.6rem 1rem;border:none;border-radius:8px;font-size:.95rem}
+.btn{
+  padding:.55rem 1rem;border:none;border-radius:8px;background:#2b90d9;
+  color:#fff;font-weight:600;cursor:pointer;transition:.25s}
+.btn:hover{background:#3da0e5}
+.link-btn{
+  background:none;border:none;color:#a8e0ff;font-size:.9rem;cursor:pointer;
+  text-decoration:underline;margin-top:.6rem}
+
+/* result card */
+#resultText{font-size:1.1rem;font-weight:600}

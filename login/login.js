@@ -1,325 +1,200 @@
-/*
-  login.js
-  - Multiple user roles (Doctor, Staff, Patient) with unique credentials & TOTP
-  - Lockout after 5 failed attempts
-  - TOTP only appears after correct username+password
-  - On successful TOTP, redirect to "../index/index.html"
-  - Persists state in localStorage to handle page refresh gracefully
-  - Adds a "Reset Lock (Test Only)" button to unlock after max attempts
-*/
+/* ------------------------------------------------------------------
+   As‑Shifa login.js – front‑end login + random 2FA + audit logging
+   • Register link (login.html) still points to register.html
+   • Works for built‑in users AND newly‑registered patients
+------------------------------------------------------------------ */
 
-/**
- * Mock Users
- * - Doctor:    dr_khan       / AsShifa#2025  / TOTP: 123456
- * - Staff:     nurse_ali     / NursePass1    / TOTP: 654321
- * - Patient:   patient_sarah / SarahPass9    / TOTP: 999999
- */
-const mockUsers = [
-  {
-    role: "doctor",
-    username: "dr_khan",
-    password: "AsShifa#2025",
-    totp: "123456",
-  },
-  {
-    role: "staff",
-    username: "nurse_ali",
-    password: "NursePass1",
-    totp: "654321",
-  },
-  {
-    role: "patient",
-    username: "patient_sarah",
-    password: "SarahPass9",
-    totp: "999999",
-  },
-];
-
-// Lockout & session
-const MAX_FAILED_ATTEMPTS = 5;
-let failedAttempts = 0;
-let isLoggedIn = false;
-let currentUser = null;
-let isWaitingForTOTP = false; // tracks if we showed TOTP input
-
-// 1 minute auto logout for demo
-const AUTO_LOGOUT_TIME = 60000;
-let sessionTimer = null;
-
-/** DOM Elements */
-const usernameInput     = document.getElementById("username");
-const passwordInput     = document.getElementById("password");
-const totpGroup         = document.getElementById("totpGroup");
-const totpInput         = document.getElementById("totp");
-const loginButton       = document.getElementById("loginButton");
-const logoutButton      = document.getElementById("logoutButton");
-const resetLockButton   = document.getElementById("resetLockButton");
-
-const errorMessage      = document.getElementById("errorMessage");
-const infoMessage       = document.getElementById("infoMessage");
-const attemptsInfo      = document.getElementById("attemptsInfo");
-
-/** On load */
-window.onload = () => {
-  // Load any previous state from localStorage
-  loadStateFromStorage();
-
-  // Re-apply the UI based on loaded state
-  updateAttemptsInfo();
-
-  // If we were in the TOTP step before the refresh, show TOTP group
-  if (isWaitingForTOTP) {
-    totpGroup.style.display = "block";
-    usernameInput.disabled = true;
-    passwordInput.disabled = true;
-  } else {
-    totpGroup.style.display = "none";
-  }
-
-  // If we were already logged in
-  if (isLoggedIn) {
-    loginButton.style.display = "none";
-    logoutButton.style.display = "inline-block";
-  } else {
-    loginButton.style.display = "inline-block";
-    logoutButton.style.display = "none";
-  }
+/* ---------- lightweight helpers (fallback if shared.js missing) ---- */
+const loadData = window.loadData || ((k, d = []) => {
+  try { const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : d; }
+  catch { return d; }
+});
+const saveData = window.saveData || ((k, v) => localStorage.setItem(k, JSON.stringify(v)));
+const audit    = msg => {
+  if (typeof window.logAction === "function") { window.logAction(msg); return; }
+  const logs = loadData("auditLog", []);
+  logs.push(`${new Date().toLocaleString()} | ${msg}`);
+  saveData("auditLog", logs);
 };
 
-/** Event listeners */
-loginButton.addEventListener("click", handleLogin);
-logoutButton.addEventListener("click", handleLogout);
-resetLockButton.addEventListener("click", handleResetLock);
+/* ---------- demo accounts ------------------------------------------ */
+const demoEmails = {
+  dr_khan:       "dr.khan@example.com",
+  nurse_ali:     "nurse.ali@example.com",
+  patient_sarah: "patient.sarah@example.com"
+};
 
-/** Handle login logic */
-function handleLogin() {
-  clearMessages();
+const mockUsers = [
+  { role:"doctor",  username:"dr_khan",       password:"AsShifa#2025", email:demoEmails.dr_khan },
+  { role:"staff",   username:"nurse_ali",     password:"NursePass1",   email:demoEmails.nurse_ali },
+  { role:"patient", username:"patient_sarah", password:"SarahPass9",   email:demoEmails.patient_sarah }
+];
 
-  if (isLoggedIn) {
-    displayError("You are already logged in.");
-    return;
-  }
-  if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-    displayError("Account locked due to too many failed attempts.");
-    return;
-  }
+const getAllUsers = () => [...mockUsers, ...loadData("patients", [])];
 
-  // Step 1: If TOTP is hidden, check username + password
-  if (!isWaitingForTOTP) {
-    checkCredentials(usernameInput.value.trim(), passwordInput.value.trim());
-  } else {
-    // Step 2: Validate TOTP
-    validateTOTP(totpInput.value.trim());
-  }
+/* ---------- 2FA helpers --------------------------------------------- */
+const gen2FACode = () => Math.floor(100000 + Math.random() * 900000).toString();
+function store2FA(email, code) {
+  const box = loadData("2faDemoCodes", {});
+  box[email.toLowerCase()] = code;
+  saveData("2faDemoCodes", box);
 }
 
-/** Check credentials against mockUsers array */
-function checkCredentials(username, password) {
-  const foundUser = mockUsers.find(
-    (u) => u.username === username && u.password === password
-  );
+/* ---------- state ---------------------------------------------------- */
+const MAX_FAILED_ATTEMPTS = 5;
+const AUTO_LOGOUT_TIME    = 60000; // 1 min demo
+let failedAttempts  = 0;
+let isLoggedIn      = false;
+let currentUser     = null;
+let isWaitingForTOTP= false;
+let sessionTimer    = null;
 
-  if (foundUser) {
-    currentUser = foundUser;
-    isWaitingForTOTP = true; // indicates we've passed password step
-    displayInfo("Credentials accepted. Please enter your 2FA code.");
-    totpGroup.style.display = "block";
-    usernameInput.disabled = true;
-    passwordInput.disabled = true;
-  } else {
-    failedAttempts++;
-    displayError("Invalid username or password.");
-  }
+/* ---------- DOM refs ------------------------------------------------- */
+const usernameInput   = document.getElementById("username");
+const passwordInput   = document.getElementById("password");
+const totpGroup       = document.getElementById("totpGroup");
+const totpInput       = document.getElementById("totp");
+const loginButton     = document.getElementById("loginButton");
+const logoutButton    = document.getElementById("logoutButton");
+const resetLockButton = document.getElementById("resetLockButton");
+const errorMessage    = document.getElementById("errorMessage");
+const infoMessage     = document.getElementById("infoMessage");
+const attemptsInfo    = document.getElementById("attemptsInfo");
 
-  updateAttemptsInfo();
-  saveStateToStorage();
-}
+/* ---------- UI helpers ---------------------------------------------- */
+const showError = t => { errorMessage.textContent=t; errorMessage.style.display="block"; infoMessage.style.display="none"; };
+const showInfo  = t => { infoMessage.textContent =t; infoMessage.style.display ="block"; errorMessage.style.display="none"; };
+const clearMsgs = () => { errorMessage.style.display = infoMessage.style.display = "none"; };
+const updateAttempts = () => attemptsInfo.textContent = `Failed Attempts: ${failedAttempts} / ${MAX_FAILED_ATTEMPTS}`;
 
-/** Validate TOTP */
-function validateTOTP(enteredTOTP) {
-  if (!currentUser) {
-    displayError("No user context found. Please try again.");
-    return;
-  }
+/* ---------- persistence --------------------------------------------- */
+const saveState = () => saveData("loginState", { failedAttempts, isLoggedIn, currentUser, isWaitingForTOTP });
+const loadState = () => {
+  const s = loadData("loginState", null);
+  if (!s) return;
+  failedAttempts   = s.failedAttempts   || 0;
+  isLoggedIn       = s.isLoggedIn       || false;
+  currentUser      = s.currentUser      || null;
+  isWaitingForTOTP = s.isWaitingForTOTP || false;
+};
 
-  if (enteredTOTP === currentUser.totp) {
-    // Success
-    isLoggedIn = true;
-    failedAttempts = 0;
-    isWaitingForTOTP = false;
-    displayInfo("Login successful!");
-    updateAttemptsInfo();
-
-    // Hide login button, show logout
-    loginButton.style.display = "none";
-    logoutButton.style.display = "inline-block";
-    totpGroup.style.display = "none";
-
-    // Start session timer
-    startAutoLogoutTimer();
-
-    saveStateToStorage();
-
-    // Redirect after short delay
-    setTimeout(() => {
-      const targetURL = `../index/index.html?role=${currentUser.role}`;
-      window.location.href = targetURL;
-    }, 800);
-
-  } else {
-    failedAttempts++;
-    displayError("Invalid 2FA code.");
-    updateAttemptsInfo();
-
-    if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-      displayError("Account locked. Too many failed attempts.");
-      totpInput.disabled = true;
-    }
-    saveStateToStorage();
-  }
-}
-
-/** Handle logout */
-function handleLogout() {
-  if (!isLoggedIn) {
-    displayError("You are not logged in.");
-    return;
-  }
-
+/* ---------- session reset ------------------------------------------- */
+function resetSessionState() {
   isLoggedIn = false;
   currentUser = null;
-  failedAttempts = 0;
   isWaitingForTOTP = false;
-
-  clearTimeout(sessionTimer);
-  sessionTimer = null;
-
-  displayInfo("You have been logged out.");
-  updateAttemptsInfo();
-
-  // Reset form & UI
-  usernameInput.disabled = false;
-  passwordInput.disabled = false;
-  totpInput.disabled = false;
-  usernameInput.value = "";
-  passwordInput.value = "";
-  totpInput.value = "";
-
+  usernameInput.disabled = passwordInput.disabled = false;
+  usernameInput.value = passwordInput.value = totpInput.value = "";
   loginButton.style.display = "inline-block";
   logoutButton.style.display = "none";
   totpGroup.style.display = "none";
-
-  saveStateToStorage();
+  totpInput.disabled = false;
+  clearTimeout(sessionTimer);
+  updateAttempts();
+  saveState();
 }
 
-/** Start auto-logout timer (1 minute) for demonstration */
+/* ---------- init ----------------------------------------------------- */
+window.onload = () => {
+  loadState();
+  if (isLoggedIn) { audit("Stale session on login → reset"); resetSessionState(); }
+  if (isWaitingForTOTP) {
+    totpGroup.style.display = "block";
+    usernameInput.disabled = passwordInput.disabled = true;
+  }
+  updateAttempts();
+};
+
+/* ---------- events --------------------------------------------------- */
+loginButton.onclick     = handleLogin;
+logoutButton.onclick    = handleLogout;
+resetLockButton.onclick = resetLock;
+
+/* ---------- login flow ---------------------------------------------- */
+function handleLogin() {
+  clearMsgs();
+  if (isLoggedIn) return showError("You are already logged in.");
+  if (failedAttempts >= MAX_FAILED_ATTEMPTS) return showError("Account locked.");
+  !isWaitingForTOTP
+    ? checkCredentials(usernameInput.value.trim(), passwordInput.value.trim())
+    : validateTOTP(totpInput.value.trim());
+}
+
+function checkCredentials(user, pass) {
+  const found = getAllUsers().find(u => u.username === user && u.password === pass);
+
+  if (found) {
+    const code  = gen2FACode();
+    const email = found.email || `${found.username}@example.com`;
+    store2FA(email, code);
+
+    currentUser      = { ...found, totp: code };
+    isWaitingForTOTP = true;
+
+    showInfo("Credentials accepted. Enter the 2FA code sent to your email.");
+    totpGroup.style.display = "block";
+    usernameInput.disabled = passwordInput.disabled = true;
+    audit(`Password OK for ${user}; 2FA code ${code} → ${email}`);
+  } else {
+    failedAttempts++;
+    showError("Invalid username or password.");
+    audit(`Failed login for ${user || "(blank user)"}`);
+    if (failedAttempts >= MAX_FAILED_ATTEMPTS) audit(`Account locked for ${user || "(blank user)"}`);
+  }
+  updateAttempts(); saveState();
+}
+
+function validateTOTP(code) {
+  if (!currentUser) return showError("No user context found.");
+
+  if (code === currentUser.totp) {
+    isLoggedIn = true; failedAttempts = 0; isWaitingForTOTP = false;
+    showInfo("Login successful!");
+    loginButton.style.display = "none";
+    logoutButton.style.display = "inline-block";
+    totpGroup.style.display = "none";
+    audit(`Login success for ${currentUser.username} (${currentUser.role})`);
+    startAutoLogoutTimer();
+    saveState();
+    setTimeout(() => location.href = `../index/index.html?role=${currentUser.role}`, 800);
+  } else {
+    failedAttempts++;
+    showError("Invalid 2FA code.");
+    audit(`Invalid TOTP for ${currentUser.username}`);
+    if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+      showError("Account locked. Too many failed attempts.");
+      totpInput.disabled = true;
+      audit(`Account locked for ${currentUser.username}`);
+    }
+    updateAttempts(); saveState();
+  }
+}
+
+/* ---------- logout / reset ------------------------------------------ */
+function handleLogout() {
+  if (!isLoggedIn) return showError("You are not logged in.");
+  audit(`Logout by ${currentUser.username}`);
+  clearTimeout(sessionTimer);
+  resetSessionState();
+  showInfo("You have been logged out.");
+}
+
+function resetLock() {
+  audit("Lock reset (test)");
+  failedAttempts = 0;
+  totpInput.disabled = false;
+  resetSessionState();
+  showInfo("Account lock reset. Try again.");
+}
+
+/* ---------- auto‑logout timer --------------------------------------- */
 function startAutoLogoutTimer() {
   clearTimeout(sessionTimer);
   sessionTimer = setTimeout(() => {
     if (isLoggedIn) {
-      // End session
-      isLoggedIn = false;
-      currentUser = null;
-      failedAttempts = 0;
-      isWaitingForTOTP = false;
-
-      displayInfo("Session timed out. You have been logged out.");
-      updateAttemptsInfo();
-
-      usernameInput.disabled = false;
-      passwordInput.disabled = false;
-      totpInput.disabled = false;
-      usernameInput.value = "";
-      passwordInput.value = "";
-      totpInput.value = "";
-
-      loginButton.style.display = "inline-block";
-      logoutButton.style.display = "none";
-      totpGroup.style.display = "none";
-
-      saveStateToStorage();
+      audit(`Session timeout for ${currentUser.username}`);
+      resetSessionState();
+      showInfo("Session timed out. You have been logged out.");
     }
   }, AUTO_LOGOUT_TIME);
-}
-
-/** Update attempts info */
-function updateAttemptsInfo() {
-  attemptsInfo.innerText = `Failed Attempts: ${failedAttempts} / ${MAX_FAILED_ATTEMPTS}`;
-}
-
-/** Utility: Display error */
-function displayError(msg) {
-  errorMessage.style.display = "block";
-  errorMessage.innerText = msg;
-  infoMessage.style.display = "none";
-}
-
-/** Utility: Display info */
-function displayInfo(msg) {
-  infoMessage.style.display = "block";
-  infoMessage.innerText = msg;
-  errorMessage.style.display = "none";
-}
-
-/** Utility: Clear both messages */
-function clearMessages() {
-  errorMessage.style.display = "none";
-  infoMessage.style.display = "none";
-}
-
-/** 
- * Reset lock state for testing 
- */
-function handleResetLock() {
-  failedAttempts = 0;
-  isLoggedIn = false;
-  isWaitingForTOTP = false;
-  currentUser = null;
-
-  // Re-enable form
-  usernameInput.disabled = false;
-  passwordInput.disabled = false;
-  totpInput.disabled = false;
-  totpGroup.style.display = "none";
-
-  // Hide logout, show login
-  loginButton.style.display = "inline-block";
-  logoutButton.style.display = "none";
-
-  clearMessages();
-  displayInfo("Account lock has been reset. Try logging in again.");
-  updateAttemptsInfo();
-
-  saveStateToStorage();
-}
-
-/** 
- * Persist login state in localStorage 
- */
-function saveStateToStorage() {
-  const state = {
-    failedAttempts,
-    isLoggedIn,
-    currentUser,
-    isWaitingForTOTP
-  };
-  localStorage.setItem("loginState", JSON.stringify(state));
-}
-
-/** 
- * Load state from localStorage 
- */
-function loadStateFromStorage() {
-  const saved = localStorage.getItem("loginState");
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      failedAttempts = parsed.failedAttempts || 0;
-      isLoggedIn = parsed.isLoggedIn || false;
-      currentUser = parsed.currentUser || null;
-      isWaitingForTOTP = parsed.isWaitingForTOTP || false;
-    } catch (e) {
-      console.warn("Error parsing saved login state:", e);
-    }
-  }
 }

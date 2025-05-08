@@ -4,15 +4,12 @@
   <meta charset="UTF-8">
   <title>As-Shifa Secure Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Link to our login-specific CSS -->
   <link rel="stylesheet" href="login.css">
 </head>
 <body>
 
-  <!-- Swirling gradient overlay -->
   <div class="background-overlay"></div>
 
-  <!-- Glass panel for login -->
   <div class="glass-panel" id="loginContainer">
     <h1 class="app-title">As-Shifa</h1>
     <p class="app-subtitle">Secure Healthcare Management</p>
@@ -20,56 +17,41 @@
     <!-- Username -->
     <div class="input-container">
       <label for="username">Username</label>
-      <input 
-        type="text" 
-        id="username" 
-        placeholder="e.g., dr_khan" 
-        required
-      />
+      <input type="text" id="username" placeholder="e.g., dr_khan" required />
     </div>
 
     <!-- Password -->
     <div class="input-container">
       <label for="password">Password</label>
-      <input 
-        type="password" 
-        id="password" 
-        placeholder="********" 
-        required
-      />
+      <input type="password" id="password" placeholder="********" required />
     </div>
 
-    <!-- TOTP (hidden until correct username+password) -->
-    <div class="input-container" id="totpGroup" style="display: none;">
+    <!-- TOTP (hidden until needed) -->
+    <div class="input-container" id="totpGroup" style="display:none;">
       <label for="totp">TOTP (2FA Code)</label>
-      <input 
-        type="text" 
-        id="totp" 
-        placeholder="XXXXXX"
-        autocomplete="one-time-code"
-      />
+      <input type="text" id="totp" placeholder="XXXXXX" autocomplete="one-time-code" />
     </div>
 
-    <!-- Error / Info messages -->
-    <p class="message error-message" id="errorMessage" style="display: none;"></p>
-    <p class="message info-message" id="infoMessage" style="display: none;"></p>
+    <!-- Messages -->
+    <p class="message error-message" id="errorMessage" style="display:none;"></p>
+    <p class="message info-message"  id="infoMessage"  style="display:none;"></p>
 
-    <!-- Buttons -->
+    <!-- Login / Logout buttons -->
     <div class="button-row">
       <button class="btn" id="loginButton">Login</button>
-      <button class="btn outline" id="logoutButton" style="display: none;">Logout</button>
+      <button class="btn outline" id="logoutButton" style="display:none;">Logout</button>
     </div>
 
-    <!-- Attempts info (lockout) -->
-    <p class="attempts-info" id="attemptsInfo"></p>
+    <!-- Register link -->
+    <div class="button-row" style="margin-top:0.8rem;">
+      <a href="register.html" class="btn outline" style="width:100%;text-align:center;">Register as Patient</a>
+    </div>
 
-    <!-- For test: Reset lock button -->
-    <button class="btn outline" id="resetLockButton" style="margin-top: 1rem;">
-      Reset Lock (Test Only)
-    </button>
+    <!-- Attempts + reset -->
+    <p class="attempts-info" id="attemptsInfo"></p>
+    <button class="btn outline" id="resetLockButton" style="margin-top:1rem;">Reset Lock (Test Only)</button>
   </div>
 
-  <!-- Link to JS -->
   <script src="login.js"></script>
 </body>
 </html>

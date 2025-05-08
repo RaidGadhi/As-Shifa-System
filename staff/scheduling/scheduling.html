@@ -5,6 +5,7 @@
   <title>As-Shifa - Staff Scheduling</title>
   <link rel="stylesheet" href="scheduling.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../shared.js"></script>
 </head>
 <body>
 
@@ -61,5 +62,17 @@
   </div>
 
   <script src="scheduling.js"></script>
+
+  <!-- Inactivity Handler -->
+  <script>
+    startSessionMonitor({
+      warnAfter: 30000,
+      logoutAfter: 60000,
+      onLogout: () => {
+        localStorage.removeItem("loginState");
+        location.href = "../../login/login.html";
+      }
+    });
+  </script>
 </body>
 </html>

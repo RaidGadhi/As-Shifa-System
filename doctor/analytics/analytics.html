@@ -1,8 +1,9 @@
+<!-- doctor/analytics/analytics.html  (FULL FILE) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>As-Shifa - Doctor Analytics</title>
+  <title>As-Shifa – Doctor Analytics</title>
   <link rel="stylesheet" href="analytics.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
@@ -20,45 +21,40 @@
       <button id="backButton" class="btn outline">Back to Dashboard</button>
     </header>
 
-    <!-- Summary Stats Section -->
+    <!-- Summary Stats -->
     <section class="stats-section">
       <h2>Key Statistics</h2>
-      <p class="intro-text">
-        Here's a brief overview of your recent clinical statistics. All data is mock-simulated for demonstration.
-      </p>
+      <p class="intro-text">Recent clinical statistics (mock data).</p>
 
       <div class="stat-cards">
-        <!-- Cards for quick info -->
-        <div class="stat-card" id="patientsSeenCard">
-          <h3>Patients Seen (Monthly)</h3>
+        <div class="stat-card">
+          <h3>Patients Seen (Monthly)</h3>
           <p class="stat-value" id="patientsSeenValue">0</p>
         </div>
-
-        <div class="stat-card" id="completedApptsCard">
-          <h3>Appointments Completed</h3>
+        <div class="stat-card">
+          <h3>Appointments Completed</h3>
           <p class="stat-value" id="completedApptsValue">0</p>
         </div>
-
-        <div class="stat-card" id="topDiagnosesCard">
-          <h3>Top Diagnoses</h3>
+        <div class="stat-card">
+          <h3>Top Diagnoses</h3>
           <ul id="topDiagnosesList"></ul>
         </div>
       </div>
     </section>
 
-    <!-- Simple Bar Chart Section -->
+    <!-- Bar Chart -->
     <section class="chart-section">
       <h2>Prescription Usage</h2>
-      <p class="intro-text">Number of prescriptions issued for the top 5 medications this quarter.</p>
+      <p class="intro-text">Top 5 medications this quarter.</p>
       <canvas id="prescriptionChart" width="600" height="400"></canvas>
     </section>
 
-    <!-- Info / Error messages -->
-    <p class="message info-message" id="infoMessage" style="display: none;"></p>
-    <p class="message error-message" id="errorMessage" style="display: none;"></p>
-
+    <!-- Messages -->
+    <p class="message info-message"  id="infoMessage"  style="display:none;"></p>
+    <p class="message error-message" id="errorMessage" style="display:none;"></p>
   </div>
 
-  <script src="analytics.js"></script>
+  <!-- ONE script, nothing else -->
+  <script type="module" src="analytics.js"></script>
 </body>
 </html>

@@ -2,25 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>As-Shifa - Doctor Prescriptions</title>
-  <link rel="stylesheet" href="prescriptions.css" />
+  <title>As‑Shifa | Doctor Prescriptions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="prescriptions.css" />
+
+  <!-- two levels up → /front-end/shared.js -->
+  <script src="../../shared.js"></script>
 </head>
 <body>
 
-  <!-- Swirling background -->
   <div class="background-overlay"></div>
 
-  <!-- Glass panel container -->
   <div class="glass-panel" id="prescriptionsContainer">
 
-    <!-- Header Bar -->
     <header class="header-bar">
       <h1>Manage Prescriptions</h1>
-      <button id="backButton" class="btn outline">Back to Dashboard</button>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
     </header>
 
-    <!-- Prescriptions Listing -->
+    <!-- Existing prescriptions -->
     <section class="prescriptions-list-section">
       <h2>Existing Prescriptions</h2>
       <p class="intro-text">Review and update active prescriptions for your patients.</p>
@@ -28,21 +28,19 @@
       <table id="prescriptionsTable">
         <thead>
           <tr>
-            <th>Prescription ID</th>
-            <th>Patient Name</th>
+            <th>ID</th>
+            <th>Patient</th>
             <th>Medication</th>
             <th>Dosage</th>
             <th>Refills Left</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Populated by prescriptions.js -->
-        </tbody>
+        <tbody><!-- filled by JS --></tbody>
       </table>
     </section>
 
-    <!-- Create New Prescription -->
+    <!-- New prescription form -->
     <section class="create-prescription-section">
       <h2>Create a New Prescription</h2>
       <p class="intro-text">Assign a medication to a patient, specify dosage and refills.</p>
@@ -50,7 +48,7 @@
       <form id="newPrescriptionForm">
         <div class="input-row">
           <label for="patientName">Patient Name</label>
-          <input type="text" id="patientName" required placeholder="e.g. John Doe" />
+          <select id="patientName"></select>
         </div>
 
         <div class="input-row">
@@ -72,11 +70,23 @@
       </form>
     </section>
 
-    <!-- Info / Error messages -->
-    <p class="message info-message" id="infoMessage" style="display: none;"></p>
-    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+    <p id="infoMessage"  class="message info-message"  style="display:none;"></p>
+    <p id="errorMessage" class="message error-message" style="display:none;"></p>
   </div>
 
+  <!-- Session monitor -->
+  <script>
+    startSessionMonitor({
+      warnAfter:   30000,
+      logoutAfter: 60000,
+      onLogout() {
+        localStorage.removeItem("loginState");
+        location.href = "../../login/login.html";
+      }
+    });
+  </script>
+
+  <!-- Page logic (plain JS, no imports) -->
   <script src="prescriptions.js"></script>
 </body>
 </html>

@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>As-Shifa - Prescription Refills</title>
-  <link rel="stylesheet" href="prescription_refills.css" />
+  <title>As‑Shifa | Prescription Refills</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="prescription_refills.css" />
+
+  <!-- two levels up → /front-end/shared.js -->
+  <script src="../../shared.js"></script>
 </head>
 <body>
 
-  <!-- Swirling background -->
   <div class="background-overlay"></div>
 
-  <!-- Glass panel container -->
   <div class="glass-panel" id="refillsContainer">
-    <!-- Header Bar -->
     <header class="header-bar">
       <h1>Prescription Refills</h1>
-      <button id="backButton" class="btn outline">Back to Dashboard</button>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
     </header>
 
-    <!-- Active Prescriptions Table -->
+    <!-- Active prescriptions -->
     <section class="prescription-section">
       <h2>Active Prescriptions</h2>
       <p class="intro-text">Below are your current prescriptions. Request a refill if needed.</p>
@@ -34,13 +34,11 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Filled dynamically by prescription_refills.js -->
-        </tbody>
+        <tbody><!-- filled by JS --></tbody>
       </table>
     </section>
 
-    <!-- Refill Request Section -->
+    <!-- Refill form -->
     <section class="request-section">
       <h2>Request a New Refill</h2>
       <p class="intro-text">Select from your active prescriptions to request a refill.</p>
@@ -48,9 +46,7 @@
       <form id="refillForm">
         <div class="input-row">
           <label for="medicationSelect">Medication</label>
-          <select id="medicationSelect" required>
-            <!-- Populated by JS -->
-          </select>
+          <select id="medicationSelect" required></select>
         </div>
 
         <div class="input-row">
@@ -62,11 +58,23 @@
       </form>
     </section>
 
-    <!-- Info / Error messages -->
-    <p class="message info-message" id="infoMessage" style="display: none;"></p>
-    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+    <p id="infoMessage"  class="message info-message"  style="display:none;"></p>
+    <p id="errorMessage" class="message error-message" style="display:none;"></p>
   </div>
 
+  <!-- Session monitor -->
+  <script>
+    startSessionMonitor({
+      warnAfter:   30000,
+      logoutAfter: 60000,
+      onLogout() {
+        localStorage.removeItem("loginState");
+        location.href = "../../login/login.html";
+      }
+    });
+  </script>
+
+  <!-- Page logic (plain JS, no imports) -->
   <script src="prescription_refills.js"></script>
 </body>
 </html>

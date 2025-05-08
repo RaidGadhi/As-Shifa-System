@@ -1,211 +1,167 @@
-/*
-  prescriptions.js
-  - Doctor's interface for viewing/creating/editing prescriptions
-  - Mock data to simulate real usage
-  - "Back to Dashboard" => index with role=doctor
-*/
+/* -----------------------------------------------------------------------
+   prescriptions.js – Doctor creates / edits / deletes prescriptions
+   Uses global helpers from shared.js (no ES‑module import)
+   ----------------------------------------------------------------------- */
 
-/** DOM References */
-const backButton = document.getElementById("backButton");
-const prescriptionsTableBody = document.querySelector("#prescriptionsTable tbody");
+/* ---------------------------- Setup ----------------------------------- */
+ensureDefaults();                           // from shared.js
 
-const newPrescriptionForm = document.getElementById("newPrescriptionForm");
-const patientNameInput = document.getElementById("patientName");
-const medicationInput = document.getElementById("medication");
-const dosageInput = document.getElementById("dosage");
-const refillsInput = document.getElementById("refills");
+const DOCTOR_NAME = "Dr. Abdullah AlQahtani";
 
-const infoMessage = document.getElementById("infoMessage");
-const errorMessage = document.getElementById("errorMessage");
+/* ---------------------------- DOM refs -------------------------------- */
+const backBtn = document.getElementById("backButton");
+const tbody   = document.querySelector("#prescriptionsTable tbody");
 
-/** Mock Prescriptions Data */
-let mockPrescriptions = [
-  {
-    id: 1001,
-    patientName: "Raid Gadhi",
-    medication: "Metformin",
-    dosage: "500mg",
-    refills: 2
-  },
-  {
-    id: 1002,
-    patientName: "Zahid AlAbadllah",
-    medication: "Amlodipine",
-    dosage: "5mg",
-    refills: 1
-  }
-];
+const form       = document.getElementById("newPrescriptionForm");
+const selPatient = document.getElementById("patientName");
+const inputMed   = document.getElementById("medication");
+const inputDose  = document.getElementById("dosage");
+const inputRefs  = document.getElementById("refills");
 
-window.onload = () => {
-  populatePrescriptionsTable();
-  // Event Listeners
-  backButton.addEventListener("click", () => {
-    window.location.href = "../../index/index.html?role=doctor";
-  });
+const infoMsg = document.getElementById("infoMessage");
+const errMsg  = document.getElementById("errorMessage");
 
-  newPrescriptionForm.addEventListener("submit", handleNewPrescription);
-};
+/* ---------------------------- Init ------------------------------------ */
+window.addEventListener("load", () => {
+  buildPatientDropdown();
+  renderTable();
 
-/**
- * Populate table with mockPrescriptions
- */
-function populatePrescriptionsTable() {
-  prescriptionsTableBody.innerHTML = "";
+  backBtn.onclick = () =>
+    (window.location.href = "../../index/index.html?role=doctor");
 
-  if (mockPrescriptions.length === 0) {
-    displayInfo("No prescriptions found.");
+  form .addEventListener("submit", createRx);
+  tbody.addEventListener("click", tableAction);
+
+  logAction("Open prescriptions page | doctor");
+});
+
+/* =======================================================================
+   Build patient dropdown
+   ======================================================================= */
+function buildPatientDropdown() {
+  const names = new Set();
+  loadData("medicalRecords").forEach(r => names.add(r.patientName));
+  loadData("appointments")  .forEach(a => names.add(a.patient));
+  loadData("prescriptions") .forEach(r => names.add(r.patientName));
+  names.add("patient_sarah"); // ensure demo patient exists
+
+  selPatient.innerHTML = "<option value=''>-- Select Patient --</option>";
+
+  if (!names.size) {
+    showWarn("No patients in the system yet.");
     return;
   }
 
-  mockPrescriptions.forEach((rx) => {
-    const tr = document.createElement("tr");
+  names.forEach(n =>
+    selPatient.insertAdjacentHTML("beforeend",
+      `<option value="${n}">${n}</option>`));
+}
 
-    const tdId = document.createElement("td");
-    tdId.textContent = rx.id;
+/* =======================================================================
+   Render table
+   ======================================================================= */
+function renderTable() {
+  tbody.innerHTML = "";
+  const list = loadData("prescriptions").filter(
+    r => r.doctor === DOCTOR_NAME
+  );
 
-    const tdPatient = document.createElement("td");
-    tdPatient.textContent = rx.patientName;
+  if (!list.length) { showInfo("No prescriptions."); return; }
 
-    const tdMedication = document.createElement("td");
-    tdMedication.textContent = rx.medication;
-
-    const tdDosage = document.createElement("td");
-    tdDosage.textContent = rx.dosage;
-
-    const tdRefills = document.createElement("td");
-    tdRefills.textContent = rx.refills;
-
-    const tdActions = document.createElement("td");
-    // Edit button
-    const editBtn = document.createElement("button");
-    editBtn.classList.add("action-btn");
-    editBtn.textContent = "Edit";
-    editBtn.onclick = () => handleEditPrescription(rx.id);
-
-    // Delete button
-    const deleteBtn = document.createElement("button");
-    deleteBtn.classList.add("action-btn");
-    deleteBtn.textContent = "Delete";
-    deleteBtn.onclick = () => handleDeletePrescription(rx.id);
-
-    tdActions.appendChild(editBtn);
-    tdActions.appendChild(deleteBtn);
-
-    tr.appendChild(tdId);
-    tr.appendChild(tdPatient);
-    tr.appendChild(tdMedication);
-    tr.appendChild(tdDosage);
-    tr.appendChild(tdRefills);
-    tr.appendChild(tdActions);
-
-    prescriptionsTableBody.appendChild(tr);
+  list.forEach(rx => {
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td>${rx.id}</td>
+        <td>${rx.patientName}</td>
+        <td>${rx.medication}</td>
+        <td>${rx.dosage}</td>
+        <td>${rx.refills}</td>
+        <td>
+          <button class="action-btn" data-id="${rx.id}" data-act="edit">Edit</button>
+          <button class="action-btn" data-id="${rx.id}" data-act="delete">Delete</button>
+        </td>
+      </tr>`);
   });
 }
 
-/**
- * Handle creating new prescription
- */
-function handleNewPrescription(e) {
+/* -------------------- table actions ----------------------------------- */
+function tableAction(e) {
+  if (!e.target.matches(".action-btn")) return;
+
+  const id  = Number(e.target.dataset.id);
+  const act = e.target.dataset.act;
+
+  const list = loadData("prescriptions");
+  const idx  = list.findIndex(r => r.id === id && r.doctor === DOCTOR_NAME);
+  if (idx === -1) { showError("Prescription not found."); return; }
+
+  if (act === "edit") {
+    const newDose = prompt("New dosage:", list[idx].dosage);
+    if (newDose === null) return;
+
+    const newRef = parseInt(prompt("New refills:", list[idx].refills), 10);
+    if (isNaN(newRef)) { showError("Invalid refills."); return; }
+
+    list[idx].dosage  = newDose;
+    list[idx].refills = newRef;
+    saveData("prescriptions", list);
+
+    logAction(`Rx edited | id=${id} | doctor`);
+    showInfo("Prescription updated.");
+  }
+
+  if (act === "delete") {
+    if (!confirm("Delete this prescription?")) return;
+    list.splice(idx, 1);
+    saveData("prescriptions", list);
+
+    logAction(`Rx deleted | id=${id} | doctor`);
+    showInfo("Prescription deleted.");
+  }
+
+  renderTable();
+}
+
+/* -------------------- create new Rx ----------------------------------- */
+function createRx(e) {
   e.preventDefault();
   clearMessages();
 
-  const patientName = patientNameInput.value.trim();
-  const medication = medicationInput.value.trim();
-  const dosage = dosageInput.value.trim();
-  const refills = parseInt(refillsInput.value, 10);
+  const patient = selPatient.value.trim();
+  const med  = inputMed.value.trim();
+  const dose = inputDose.value.trim();
+  const refs = parseInt(inputRefs.value, 10);
 
-  if (!patientName || !medication || !dosage || isNaN(refills)) {
-    displayError("All fields are required. Please fill out the form correctly.");
+  if (!patient || !med || !dose || isNaN(refs)) {
+    showError("Please fill all fields.");
     return;
   }
 
-  // Create a new prescription object
-  const newRx = {
-    id: generateNewId(),
-    patientName,
-    medication,
-    dosage,
-    refills
-  };
+  const list  = loadData("prescriptions");
+  const newId = Math.max(1000, ...list.map(r => r.id)) + 1;
 
-  mockPrescriptions.push(newRx);
-  displayInfo("New prescription created successfully!");
-
-  newPrescriptionForm.reset();
-  populatePrescriptionsTable();
-}
-
-/**
- * Generate new ID (mock)
- */
-function generateNewId() {
-  let maxId = 0;
-  mockPrescriptions.forEach(rx => {
-    if (rx.id > maxId) {
-      maxId = rx.id;
-    }
+  list.push({
+    id: newId,
+    doctor: DOCTOR_NAME,
+    patientName: patient,
+    medication: med,
+    dosage: dose,
+    refills: refs
   });
-  return maxId + 1;
+
+  saveData("prescriptions", list);
+  logAction(`Rx created | id=${newId} | patient=${patient}`);
+  showInfo("Prescription added.");
+
+  form.reset();
+  buildPatientDropdown();
+  renderTable();
 }
 
-/**
- * Edit an existing prescription
- * For the demo, let's just do a simple prompt
- */
-function handleEditPrescription(rxId) {
-  const rx = mockPrescriptions.find(r => r.id === rxId);
-  if (!rx) {
-    displayError("Prescription not found.");
-    return;
-  }
-
-  // Basic approach: prompt for new dosage & refills
-  const newDosage = prompt("Enter new dosage (e.g. '500mg'):", rx.dosage);
-  if (newDosage === null) return; // user canceled
-  const newRefillsStr = prompt("Enter new refills (e.g. '2'):", rx.refills);
-  if (newRefillsStr === null) return; // user canceled
-
-  const newRefills = parseInt(newRefillsStr, 10);
-  if (isNaN(newRefills)) {
-    displayError("Invalid refills input.");
-    return;
-  }
-
-  rx.dosage = newDosage;
-  rx.refills = newRefills;
-  displayInfo(`Prescription #${rx.id} updated successfully.`);
-
-  populatePrescriptionsTable();
-}
-
-/**
- * Delete a prescription
- */
-function handleDeletePrescription(rxId) {
-  const confirmDelete = confirm("Are you sure you want to delete this prescription?");
-  if (!confirmDelete) return;
-
-  mockPrescriptions = mockPrescriptions.filter(r => r.id !== rxId);
-  displayInfo("Prescription deleted.");
-  populatePrescriptionsTable();
-}
-
-/** Utility: clear messages */
-function clearMessages() {
-  infoMessage.style.display = "none";
-  errorMessage.style.display = "none";
-}
-
-/** Utility: display info */
-function displayInfo(msg) {
-  infoMessage.style.display = "block";
-  infoMessage.innerText = msg;
-  errorMessage.style.display = "none";
-}
-
-/** Utility: display error */
-function displayError(msg) {
-  errorMessage.style.display = "block";
-  errorMessage.innerText = msg;
-  infoMessage.style.display = "none";
-}
+/* =======================================================================
+   Helpers
+   ======================================================================= */
+function showInfo (m){ infoMsg.innerText = m; infoMsg.style.display = "block"; errMsg.style.display = "none"; }
+function showError(m){ errMsg .innerText = m; errMsg .style.display = "block"; infoMsg.style.display = "none"; }
+function showWarn (m){ infoMsg.innerText = m; infoMsg.style.display = "block"; errMsg.style.display = "none"; }
+function clearMessages(){ infoMsg.style.display="none"; errMsg.style.display="none"; }

@@ -1,100 +1,63 @@
-/*
-  my_medical_records.js
-  - Mock data for the patient's medical records
-  - Populates the table
-  - "Back to Dashboard" button => ../index/index.html?role=patient
-*/
+/* -----------------------------------------------------------------------
+   my_medical_records.js – Patient read‑only view of medical records
+   Relies on globals from shared.js (no ES‑module import)
+   ----------------------------------------------------------------------- */
 
-/** DOM Elements */
-const recordsTableBody = document.querySelector("#recordsTable tbody");
-const backButton = document.getElementById("backButton");
+/* ---------------------------- Setup ----------------------------------- */
+ensureDefaults();                         // from shared.js
 
-const infoMessage = document.getElementById("infoMessage");
-const errorMessage = document.getElementById("errorMessage");
+const CURRENT_PATIENT = "patient_sarah";
 
-/** Mock Medical Records (for demonstration) */
-const mockRecords = [
-  {
-    date: "2025-03-10",
-    doctor: "Dr. Abdullah AlQahtani",
-    diagnosis: "Type 2 Diabetes - Stable",
-    prescriptions: "Metformin 500mg",
-    labResults: "HbA1c: 6.8%"
-  },
-  {
-    date: "2025-03-22",
-    doctor: "Dr. Sarah AlMohanna",
-    diagnosis: "Seasonal Allergies",
-    prescriptions: "Cetirizine 10mg",
-    labResults: "Allergy Test Panel: Positive for pollen"
-  },
-  {
-    date: "2025-04-05",
-    doctor: "Dr. Abdullah AlQahtani",
-    diagnosis: "Follow-up - Diabetes",
-    prescriptions: "Metformin 500mg, Vitamin D supplement",
-    labResults: "HbA1c: 6.5%"
-  },
-];
+/* ---------------------------- DOM refs -------------------------------- */
+const tbody        = document.querySelector("#recordsTable tbody");
+const backBtn      = document.getElementById("backButton");
+const infoMsg      = document.getElementById("infoMessage");
+const errMsg       = document.getElementById("errorMessage");
 
-/** On page load, populate the table with mock data */
-window.onload = () => {
-  populateRecordsTable();
-};
+/* ---------------------------- Init ------------------------------------ */
+window.addEventListener("load", () => {
+  renderTable();
 
-/** Populate the table with the mockRecords array */
-function populateRecordsTable() {
-  // Clear existing rows
-  recordsTableBody.innerHTML = "";
+  backBtn.onclick = () =>
+    (window.location.href = "../../index/index.html?role=patient");
 
-  if (mockRecords.length === 0) {
-    displayInfo("No medical records found.");
+  logAction("Open my medical records page | patient");
+});
+
+/* =======================================================================
+   Render
+   ======================================================================= */
+function renderTable() {
+  tbody.innerHTML = "";
+
+  const data = loadData("medicalRecords").filter(
+    r => r.patientName === CURRENT_PATIENT
+  );
+
+  if (!data.length) {
+    showInfo("No medical records found.");
     return;
   }
 
-  // Create a row for each record
-  mockRecords.forEach(record => {
-    const tr = document.createElement("tr");
-
-    const tdDate = document.createElement("td");
-    tdDate.textContent = record.date;
-
-    const tdDoctor = document.createElement("td");
-    tdDoctor.textContent = record.doctor;
-
-    const tdDiagnosis = document.createElement("td");
-    tdDiagnosis.textContent = record.diagnosis;
-
-    const tdPrescriptions = document.createElement("td");
-    tdPrescriptions.textContent = record.prescriptions;
-
-    const tdLabResults = document.createElement("td");
-    tdLabResults.textContent = record.labResults;
-
-    tr.appendChild(tdDate);
-    tr.appendChild(tdDoctor);
-    tr.appendChild(tdDiagnosis);
-    tr.appendChild(tdPrescriptions);
-    tr.appendChild(tdLabResults);
-
-    recordsTableBody.appendChild(tr);
+  data.forEach(rec => {
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td>${fmtDate(rec.lastUpdated || rec.date)}</td>
+        <td>${rec.doctor || "—"}</td>
+        <td>${rec.diagnosis}</td>
+        <td>${rec.prescriptions}</td>
+        <td>${rec.labResults}</td>
+      </tr>`);
   });
 }
 
-/** Handle messages */
-function displayInfo(msg) {
-  infoMessage.style.display = "block";
-  infoMessage.innerText = msg;
-  errorMessage.style.display = "none";
+/* =======================================================================
+   Helpers
+   ======================================================================= */
+function fmtDate(raw) {
+  const d = new Date(raw);
+  return isNaN(d) ? (raw || "—") : d.toLocaleDateString();
 }
 
-function displayError(msg) {
-  errorMessage.style.display = "block";
-  errorMessage.innerText = msg;
-  infoMessage.style.display = "none";
-}
-
-/** "Back to Dashboard" => patient role */
-backButton.addEventListener("click", () => {
-  window.location.href = "../../index/index.html?role=patient";
-});
+function showInfo (m){ infoMsg.innerText = m; infoMsg.style.display = "block"; errMsg.style.display = "none"; }
+function showError(m){ errMsg .innerText = m; errMsg .style.display = "block"; infoMsg.style.display = "none"; }

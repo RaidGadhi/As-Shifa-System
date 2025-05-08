@@ -2,78 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>As-Shifa - Patient Vitals</title>
-  <link rel="stylesheet" href="patient_vitals.css" />
+  <title>As‑Shifa | Patient Vitals</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="patient_vitals.css" />
+
+  <!-- two levels up → /front-end/shared.js -->
+  <script src="../../shared.js"></script>
+
+  <!-- CryptoJS for AES -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
 
-  <!-- Swirling background -->
   <div class="background-overlay"></div>
 
-  <!-- Glass panel container -->
   <div class="glass-panel" id="vitalsContainer">
-
-    <!-- Header Bar -->
     <header class="header-bar">
-      <h1>Manage Patient Vitals</h1>
-      <button id="backButton" class="btn outline">Back to Dashboard</button>
+      <h1>Patient Vitals</h1>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
     </header>
 
-    <!-- Search / Filter Section -->
+    <!-- Search -->
     <section class="search-section">
-      <h2>Search Patient</h2>
-      <p class="intro-text">Enter a patient ID or name to view/update vitals.</p>
-
+      <h2>Find Patient</h2>
       <form id="searchForm">
         <div class="input-row">
-          <label for="patientSearch">Patient ID / Name</label>
-          <input type="text" id="patientSearch" placeholder="e.g. 12345 or John Doe" required />
+          <label for="patientSearch">Patient ID / Name</label>
+          <input id="patientSearch" type="text" placeholder="e.g., 12345 or John Doe" required />
         </div>
-        <button type="submit" class="btn">Search</button>
+        <button class="btn" type="submit">Search</button>
       </form>
     </section>
 
-    <!-- Results / Vitals Section -->
+    <!-- Vitals form -->
     <section class="vitals-section">
-      <h2>Patient Vitals</h2>
-      <p class="intro-text">Once you find a patient, record or update the vitals below.</p>
-
+      <h2>Record / Update Vitals</h2>
       <form id="vitalsForm">
-        <div class="input-row">
-          <label for="height">Height (cm)</label>
-          <input type="number" id="height" min="0" />
-        </div>
-
-        <div class="input-row">
-          <label for="weight">Weight (kg)</label>
-          <input type="number" id="weight" min="0" />
-        </div>
-
-        <div class="input-row">
-          <label for="bloodPressure">Blood Pressure</label>
-          <input type="text" id="bloodPressure" placeholder="e.g. 120/80" />
-        </div>
-
-        <div class="input-row">
-          <label for="temp">Temperature (°C)</label>
-          <input type="number" id="temp" min="0" max="50" />
-        </div>
-
-        <div class="input-row">
-          <label for="notes">Additional Notes</label>
-          <textarea id="notes" rows="3" placeholder="Symptoms, etc."></textarea>
-        </div>
-
-        <button type="submit" class="btn">Save Vitals</button>
+        <div class="input-row"><label>Height (cm)</label><input id="height" type="number" /></div>
+        <div class="input-row"><label>Weight (kg)</label><input id="weight" type="number" /></div>
+        <div class="input-row"><label>Blood Pressure</label><input id="bloodPressure" type="text" /></div>
+        <div class="input-row"><label>Temperature (°C)</label><input id="temp" type="number" step="0.1" /></div>
+        <div class="input-row"><label>Notes</label><textarea id="notes" rows="2"></textarea></div>
+        <button class="btn" type="submit">Save Vitals</button>
       </form>
     </section>
 
-    <!-- Info / Error messages -->
-    <p class="message info-message" id="infoMessage" style="display: none;"></p>
-    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+    <p id="infoMessage"  class="message info-message"  style="display:none;"></p>
+    <p id="errorMessage" class="message error-message" style="display:none;"></p>
   </div>
 
+  <!-- Session monitor -->
+  <script>
+    startSessionMonitor({
+      warnAfter:   30000,
+      logoutAfter: 60000,
+      onLogout() {
+        localStorage.removeItem("loginState");
+        location.href = "../../login/login.html";
+      }
+    });
+  </script>
+
+  <!-- Page logic -->
   <script src="patient_vitals.js"></script>
 </body>
 </html>

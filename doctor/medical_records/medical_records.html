@@ -2,64 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>As-Shifa - Doctor Medical Records</title>
-  <link rel="stylesheet" href="medical_records.css" />
+  <title>As‑Shifa | Doctor Medical Records</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="medical_records.css" />
+
+  <!-- two levels up → /front-end/shared.js -->
+  <script src="../../shared.js"></script>
 </head>
 <body>
 
-  <!-- Swirling background -->
   <div class="background-overlay"></div>
 
-  <!-- Glass panel container -->
   <div class="glass-panel" id="recordsContainer">
 
-    <!-- Header Bar -->
     <header class="header-bar">
       <h1>Manage Medical Records</h1>
-      <button id="backButton" class="btn outline">Back to Dashboard</button>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
     </header>
 
-    <!-- Search / Filter Section -->
+    <!-- Search -->
     <section class="search-section">
       <h2>Search Patient Records</h2>
-      <p class="intro-text">Find a patient record by ID or name and update as needed.</p>
-
       <form id="searchForm">
         <div class="input-row">
-          <label for="patientSearch">Patient ID / Name</label>
-          <input type="text" id="patientSearch" placeholder="e.g., 12345 or John Doe" required />
+          <label for="patientSearch">Patient ID / Name</label>
+          <input id="patientSearch" type="text" placeholder="e.g., 101 or Sarah" required />
         </div>
-        <button type="submit" class="btn">Search</button>
+        <button class="btn" type="submit">Search</button>
       </form>
     </section>
 
-    <!-- Results Table -->
+    <!-- Table -->
     <section class="results-section">
       <h2>Patient Records</h2>
-      <p class="intro-text">Select a record to edit the diagnosis, prescriptions, or lab results.</p>
-
       <table id="recordsTable">
         <thead>
           <tr>
-            <th>Patient ID</th>
-            <th>Patient Name</th>
+            <th>ID</th>
+            <th>Patient</th>
             <th>Diagnosis</th>
             <th>Prescriptions</th>
             <th>Lab Results</th>
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Populated by medical_records.js -->
-        </tbody>
+        <tbody><!-- filled by JS --></tbody>
       </table>
     </section>
 
-    <!-- Edit Modal (Diagnosis, Prescriptions, Lab) -->
-    <div class="modal-overlay" id="editModal" style="display: none;">
+    <!-- Edit modal -->
+    <div class="modal-overlay" id="editModal" style="display:none;">
       <div class="modal-content">
-        <span class="close-btn" id="closeEditModal">&times;</span>
+        <span id="closeEditModal" class="close-btn">&times;</span>
         <h2>Edit Record</h2>
         <form id="editForm">
           <div class="input-row">
@@ -74,17 +68,28 @@
             <label for="editLabResults">Lab Results</label>
             <textarea id="editLabResults" rows="2"></textarea>
           </div>
-          <button type="submit" class="btn">Save Changes</button>
+          <button class="btn" type="submit">Save Changes</button>
         </form>
       </div>
     </div>
 
-    <!-- Info / Error messages -->
-    <p class="message info-message" id="infoMessage" style="display: none;"></p>
-    <p class="message error-message" id="errorMessage" style="display: none;"></p>
-
+    <p id="infoMessage"  class="message info-message"  style="display:none;"></p>
+    <p id="errorMessage" class="message error-message" style="display:none;"></p>
   </div>
 
+  <!-- Session monitor -->
+  <script>
+    startSessionMonitor({
+      warnAfter:   30000,
+      logoutAfter: 60000,
+      onLogout() {
+        localStorage.removeItem("loginState");
+        location.href = "../../login/login.html";
+      }
+    });
+  </script>
+
+  <!-- Page logic (plain JS, no imports) -->
   <script src="medical_records.js"></script>
 </body>
 </html>

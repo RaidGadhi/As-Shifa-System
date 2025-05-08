@@ -5,6 +5,7 @@
   <title>As-Shifa - Personal Settings</title>
   <link rel="stylesheet" href="personal_settings.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../shared.js"></script>
 </head>
 <body>
 
@@ -75,5 +76,17 @@
   </div>
 
   <script src="personal_settings.js"></script>
+
+  <!-- Session Monitor -->
+  <script>
+    startSessionMonitor({
+      warnAfter: 30000,
+      logoutAfter: 60000,
+      onLogout: () => {
+        localStorage.removeItem("loginState");
+        location.href = "../login/login.html";
+      }
+    });
+  </script>
 </body>
 </html>

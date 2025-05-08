@@ -1,141 +1,133 @@
-/*
-  patient_vitals.js
-  - Staff page for searching a patient and recording/updating their vitals
-  - Uses mock data for demonstration
-  - "Back to Dashboard" => ../index/index.html?role=staff
-*/
+/* -----------------------------------------------------------------------
+   patient_vitals.js – Staff page with AES‑encrypted storage
+   ----------------------------------------------------------------------- */
 
-/** DOM References */
-const backButton = document.getElementById("backButton");
-const searchForm = document.getElementById("searchForm");
+/* ---------------------------- Setup ----------------------------------- */
+ensureDefaults();                         // from shared.js
+const AES_KEY = "as-shifa-demo-key";      // static demo key (do NOT use in prod)
+
+/* ---------------------------- DOM refs -------------------------------- */
+const backBtn  = document.getElementById("backButton");
+const searchF  = document.getElementById("searchForm");
 const patientSearchInput = document.getElementById("patientSearch");
-const vitalsForm = document.getElementById("vitalsForm");
+const vitalsF  = document.getElementById("vitalsForm");
 
 const heightInput = document.getElementById("height");
 const weightInput = document.getElementById("weight");
-const bloodPressureInput = document.getElementById("bloodPressure");
-const tempInput = document.getElementById("temp");
-const notesInput = document.getElementById("notes");
+const bpInput     = document.getElementById("bloodPressure");
+const tempInput   = document.getElementById("temp");
+const notesInput  = document.getElementById("notes");
 
-const infoMessage = document.getElementById("infoMessage");
-const errorMessage = document.getElementById("errorMessage");
+const infoMsg = document.getElementById("infoMessage");
+const errMsg  = document.getElementById("errorMessage");
 
-/** Mock Patient Vitals Data (by ID or name) */
-let mockVitalsRecords = {
-  "12345": {
-    height: 170,
-    weight: 70,
-    bloodPressure: "120/80",
-    temp: 37,
-    notes: "No current complaints."
-  },
-  "john doe": {
-    height: 180,
-    weight: 80,
-    bloodPressure: "130/85",
-    temp: 37.5,
-    notes: "Mild cough reported."
-  }
-};
+/* ---------------------------- LocalStorage wrapper -------------------- */
+function loadVitalsStore()  { return loadData("vitals", {}); }
+function saveVitalsStore(o) { saveData("vitals", o); }
 
-// The "current" key after a search
-let currentPatientKey = null;
+/* ---------------------------- Globals --------------------------------- */
+let vitalsStore        = loadVitalsStore();
+let currentPatientKey  = null;
 
-window.onload = () => {
-  backButton.addEventListener("click", () => {
-    window.location.href = "../../index/index.html?role=staff";
-  });
+/* ---------------------------- Init ------------------------------------ */
+window.addEventListener("load", () => {
+  backBtn.onclick = () =>
+    (window.location.href = "../../index/index.html?role=staff");
 
-  searchForm.addEventListener("submit", handleSearch);
-  vitalsForm.addEventListener("submit", handleSaveVitals);
-};
+  searchF .addEventListener("submit", handleSearch);
+  vitalsF.addEventListener("submit", handleSave);
 
-/**
- * Handle searching for a patient
- */
+  logAction("Open patient vitals page | staff");
+});
+
+/* =======================================================================
+   Search patient
+   ======================================================================= */
 function handleSearch(e) {
-  e.preventDefault();
-  clearMessages();
+  e.preventDefault(); clearMsgs();
 
-  const query = patientSearchInput.value.trim().toLowerCase();
-  if (!query) {
-    displayError("Please enter a patient ID or name.");
-    return;
-  }
+  const key = patientSearchInput.value.trim().toLowerCase();
+  if (!key) { showError("Please enter a patient ID or name."); return; }
 
-  // Check if we have that record in mockVitalsRecords
-  if (mockVitalsRecords[query]) {
-    currentPatientKey = query;
-    populateVitalsForm(mockVitalsRecords[query]);
-    displayInfo(`Patient record found for "${query}". Update vitals as needed.`);
+  if (vitalsStore[key]) {
+    currentPatientKey = key;
+    populateForm(decryptVitals(vitalsStore[key]));
+    showInfo(`Record found for "${key}".`);
   } else {
-    // Not found
     currentPatientKey = null;
-    clearVitalsForm();
-    displayError(`No record found for "${query}".`);
+    clearForm();
+    showError(`No record found for "${key}".`);
   }
 }
 
-/**
- * Populate the vitals form with data
- */
-function populateVitalsForm(vitalsData) {
-  heightInput.value = vitalsData.height || "";
-  weightInput.value = vitalsData.weight || "";
-  bloodPressureInput.value = vitalsData.bloodPressure || "";
-  tempInput.value = vitalsData.temp || "";
-  notesInput.value = vitalsData.notes || "";
-}
+/* =======================================================================
+   Save / update vitals
+   ======================================================================= */
+function handleSave(e) {
+  e.preventDefault(); clearMsgs();
 
-/**
- * Clear the vitals form
- */
-function clearVitalsForm() {
-  heightInput.value = "";
-  weightInput.value = "";
-  bloodPressureInput.value = "";
-  tempInput.value = "";
-  notesInput.value = "";
-}
+  const key = patientSearchInput.value.trim().toLowerCase();
+  if (!key) { showError("Search for a patient first."); return; }
 
-/**
- * Handle saving vitals
- */
-function handleSaveVitals(e) {
-  e.preventDefault();
-  clearMessages();
-
-  if (!currentPatientKey) {
-    displayError("No patient selected. Please search for a patient first.");
-    return;
-  }
-
-  // Update the mock data
-  mockVitalsRecords[currentPatientKey] = {
+  const vitalsObj = {
     height: parseInt(heightInput.value, 10) || 0,
     weight: parseInt(weightInput.value, 10) || 0,
-    bloodPressure: bloodPressureInput.value.trim(),
+    bloodPressure: bpInput.value.trim(),
     temp: parseFloat(tempInput.value) || 0,
-    notes: notesInput.value.trim()
+    notes: notesInput.value.trim(),
+    updatedAt: new Date().toISOString()
   };
 
-  displayInfo("Vitals saved successfully!");
+  const cipher = encryptVitals(vitalsObj);
+  vitalsStore[key] = cipher;
+  saveVitalsStore(vitalsStore);
+
+  logAction(`Vitals saved (encrypted) | patient=${key}`);
+  console.log("🔒 Encrypted:", cipher);
+  console.log("🔓 Decrypted:", vitalsObj);
+
+  showInfo("Vitals saved (encrypted).");
+  currentPatientKey = key;
 }
 
-/** Utility: show info/error */
-function displayInfo(msg) {
-  infoMessage.style.display = "block";
-  infoMessage.innerText = msg;
-  errorMessage.style.display = "none";
+/* =======================================================================
+   Encryption helpers
+   ======================================================================= */
+function encryptVitals(obj) {
+  return CryptoJS.AES.encrypt(JSON.stringify(obj), AES_KEY).toString();
 }
 
-function displayError(msg) {
-  errorMessage.style.display = "block";
-  errorMessage.innerText = msg;
-  infoMessage.style.display = "none";
+function decryptVitals(cipher) {
+  try {
+    const bytes = CryptoJS.AES.decrypt(cipher, AES_KEY);
+    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  } catch {
+    return {}; // corrupted or wrong key
+  }
 }
 
-function clearMessages() {
-  infoMessage.style.display = "none";
-  errorMessage.style.display = "none";
+/* =======================================================================
+   Form helpers
+   ======================================================================= */
+function populateForm(v) {
+  heightInput.value = v.height || "";
+  weightInput.value = v.weight || "";
+  bpInput.value     = v.bloodPressure || "";
+  tempInput.value   = v.temp || "";
+  notesInput.value  = v.notes || "";
 }
+
+function clearForm() {
+  heightInput.value = "";
+  weightInput.value = "";
+  bpInput.value     = "";
+  tempInput.value   = "";
+  notesInput.value  = "";
+}
+
+/* =======================================================================
+   UI helpers
+   ======================================================================= */
+function showInfo (m){ infoMsg.innerText = m; infoMsg.style.display = "block"; errMsg.style.display = "none"; }
+function showError(m){ errMsg .innerText = m; errMsg .style.display = "block"; infoMsg.style.display = "none"; }
+function clearMsgs(){ infoMsg.style.display="none"; errMsg.style.display="none"; }

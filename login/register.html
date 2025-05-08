@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As‑Shifa | Patient Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Path to shared helpers (adjust “../” if needed) -->
+  <script src="../shared.js"></script>
+  <link rel="stylesheet" href="register.css" />
+</head>
+<body>
+
+  <div class="background-overlay"></div>
+
+  <div class="glass-panel">
+    <h1 class="app-title">Register as Patient</h1>
+
+    <!-- Full Name -->
+    <div class="input-container">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" placeholder="John Doe" required />
+    </div>
+
+    <!-- Username -->
+    <div class="input-container">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="john_doe" required />
+    </div>
+
+    <!-- E‑mail -->
+    <div class="input-container">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="john@example.com" required />
+    </div>
+
+    <!-- Phone -->
+    <div class="input-container">
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" placeholder="+966 5XXXXXXXX" required />
+    </div>
+
+    <!-- Password -->
+    <div class="input-container">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Strong password" required />
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="input-container">
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" placeholder="Repeat password" required />
+    </div>
+
+    <!-- Messages -->
+    <p id="errorMessage" class="message error-message" style="display:none;"></p>
+    <p id="infoMessage"  class="message info-message"  style="display:none;"></p>
+
+    <div class="button-row">
+      <button class="btn" id="registerButton">Register</button>
+      <button class="btn outline" id="gotoLoginButton">← Back to Login</button>
+    </div>
+  </div>
+
+  <script src="register.js"></script>
+</body>
+</html>

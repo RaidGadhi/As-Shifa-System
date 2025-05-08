@@ -1,188 +1,109 @@
-/*
-  prescription_refills.js
-  - Mock data for patient's active prescriptions
-  - "Request Refill" actions (table row + separate form)
-  - "Back to Dashboard" => patient homepage
-*/
+/* -----------------------------------------------------------------------
+   prescription_refills.js – Patient requests refills
+   Relies on globals from shared.js (no ES‑module import)
+   ----------------------------------------------------------------------- */
 
-/** DOM References */
-const prescriptionsTableBody = document.querySelector("#prescriptionsTable tbody");
-const medicationSelect = document.getElementById("medicationSelect");
-const refillForm = document.getElementById("refillForm");
-const backButton = document.getElementById("backButton");
+/* ---------------------------- Setup ----------------------------------- */
+ensureDefaults();                         // from shared.js
 
-const infoMessage = document.getElementById("infoMessage");
-const errorMessage = document.getElementById("errorMessage");
+const PATIENT = "patient_sarah";
 
-/** Mock Prescriptions */
-let mockPrescriptions = [
-  {
-    id: 1,
-    medication: "Metformin",
-    dosage: "500mg",
-    refillsLeft: 2,
-    status: "Active"
-  },
-  {
-    id: 2,
-    medication: "Losartan",
-    dosage: "50mg",
-    refillsLeft: 1,
-    status: "Active"
-  },
-  {
-    id: 3,
-    medication: "Atorvastatin",
-    dosage: "20mg",
-    refillsLeft: 0,
-    status: "Expired"
-  }
-];
+/* ---------------------------- DOM refs -------------------------------- */
+const tbody   = document.querySelector("#prescriptionsTable tbody");
+const medSel  = document.getElementById("medicationSelect");
+const form    = document.getElementById("refillForm");
+const backBtn = document.getElementById("backButton");
+const infoMsg = document.getElementById("infoMessage");
+const errMsg  = document.getElementById("errorMessage");
 
-window.onload = () => {
-  populatePrescriptionsTable();
-  populateMedicationSelect();
+/* ---------------------------- Init ------------------------------------ */
+window.addEventListener("load", () => {
+  renderTableAndDropdown();
 
-  // Events
-  refillForm.addEventListener("submit", handleRefillFormSubmit);
-  backButton.addEventListener("click", () => {
-    window.location.href = "../../index/index.html?role=patient";
-  });
-};
-
-/**
- * Populate the table with current prescriptions
- */
-function populatePrescriptionsTable() {
-  prescriptionsTableBody.innerHTML = "";
-
-  if (mockPrescriptions.length === 0) {
-    displayInfo("You have no active prescriptions.");
-    return;
-  }
-
-  mockPrescriptions.forEach((rx) => {
-    const tr = document.createElement("tr");
-
-    const tdMed = document.createElement("td");
-    tdMed.textContent = rx.medication;
-
-    const tdDosage = document.createElement("td");
-    tdDosage.textContent = rx.dosage;
-
-    const tdRefillsLeft = document.createElement("td");
-    tdRefillsLeft.textContent = rx.refillsLeft;
-
-    const tdStatus = document.createElement("td");
-    tdStatus.textContent = rx.status;
-
-    const tdAction = document.createElement("td");
-    if (rx.status === "Active" && rx.refillsLeft > 0) {
-      const reqRefillBtn = document.createElement("button");
-      reqRefillBtn.classList.add("action-btn");
-      reqRefillBtn.textContent = "Request Refill";
-      reqRefillBtn.onclick = () => handleInlineRefillRequest(rx.id);
-      tdAction.appendChild(reqRefillBtn);
-    } else {
-      tdAction.textContent = "Not Refillable";
-    }
-
-    tr.appendChild(tdMed);
-    tr.appendChild(tdDosage);
-    tr.appendChild(tdRefillsLeft);
-    tr.appendChild(tdStatus);
-    tr.appendChild(tdAction);
-
-    prescriptionsTableBody.appendChild(tr);
-  });
-}
-
-/**
- * Populate the medication dropdown with "active" prescriptions
- */
-function populateMedicationSelect() {
-  medicationSelect.innerHTML = "<option value=''>--Select Medication--</option>";
-  // Only add active & refillable items
-  const activeRefillable = mockPrescriptions.filter(
-    (rx) => rx.status === "Active" && rx.refillsLeft > 0
+  form .addEventListener("submit", submitRefill);
+  tbody.addEventListener("click", inlineAction);
+  backBtn.addEventListener("click",
+    () => (window.location.href = "../../index/index.html?role=patient")
   );
-  activeRefillable.forEach((rx) => {
-    const option = document.createElement("option");
-    option.value = rx.id; // store ID
-    option.textContent = `${rx.medication} (${rx.dosage}) - ${rx.refillsLeft} refills left`;
-    medicationSelect.appendChild(option);
+
+  logAction("Open prescription refills page | patient");
+});
+
+/* =======================================================================
+   Render table + dropdown
+   ======================================================================= */
+function renderTableAndDropdown() {
+  const rxs = loadData("prescriptions").filter(
+    r => r.patientName === PATIENT
+  );
+
+  /* --- table --- */
+  tbody.innerHTML = "";
+  if (!rxs.length) {
+    showInfo("No prescriptions.");
+    medSel.innerHTML = "";
+    return;
+  }
+
+  rxs.forEach(rx => {
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td>${rx.medication}</td>
+        <td>${rx.dosage}</td>
+        <td>${rx.refills}</td>
+        <td>${rx.refills > 0 ? "Active" : "Expired"}</td>
+        <td>
+          ${rx.refills > 0
+            ? `<button class="action-btn" data-id="${rx.id}">Request Refill</button>`
+            : "N/A"}
+        </td>
+      </tr>`);
+  });
+
+  /* --- dropdown --- */
+  medSel.innerHTML = "<option value=''>-- Select Medication --</option>";
+  rxs.filter(r => r.refills > 0).forEach(rx => {
+    medSel.insertAdjacentHTML("beforeend", `
+      <option value="${rx.id}">
+        ${rx.medication} (${rx.dosage}) – ${rx.refills} left
+      </option>`);
   });
 }
 
-/**
- * Inline refill request from the table
- */
-function handleInlineRefillRequest(rxId) {
-  // Just mimic the action of requesting refill
-  const foundRx = mockPrescriptions.find((r) => r.id === rxId);
-  if (!foundRx) {
-    displayError("Prescription not found.");
-    return;
-  }
-  if (foundRx.refillsLeft <= 0) {
-    displayError("No refills left for this medication.");
-    return;
-  }
-
-  // Decrement refills
-  foundRx.refillsLeft--;
-  displayInfo(`Refill requested for ${foundRx.medication} (inline).`);
-  populatePrescriptionsTable();
-  populateMedicationSelect();
+/* -------------------- inline-button handler --------------------------- */
+function inlineAction(e) {
+  if (!e.target.matches(".action-btn")) return;
+  requestRefill(Number(e.target.dataset.id));
 }
 
-/**
- * Handle the refill form submission
- */
-function handleRefillFormSubmit(e) {
+/* -------------------- form submit ------------------------------------ */
+function submitRefill(e) {
   e.preventDefault();
-
-  const selectedId = medicationSelect.value;
-  if (!selectedId) {
-    displayError("Please select a medication to refill.");
-    return;
-  }
-
-  const foundRx = mockPrescriptions.find((r) => r.id == selectedId);
-  if (!foundRx) {
-    displayError("Medication not found.");
-    return;
-  }
-  if (foundRx.refillsLeft <= 0) {
-    displayError("No refills left for this medication.");
-    return;
-  }
-
-  // Optionally handle comments
-  const comments = document.getElementById("comments").value.trim();
-
-  // Decrement refills
-  foundRx.refillsLeft--;
-  displayInfo(
-    `Refill requested for ${foundRx.medication}. ${comments ? "Comments: " + comments : ""}`
-  );
-  // Clear the form
-  refillForm.reset();
-
-  // Re-render table + dropdown
-  populatePrescriptionsTable();
-  populateMedicationSelect();
+  const id = Number(medSel.value);
+  if (!id) { showError("Select a medication."); return; }
+  requestRefill(id);
 }
 
-/** Message utilities */
-function displayInfo(msg) {
-  infoMessage.style.display = "block";
-  infoMessage.innerText = msg;
-  errorMessage.style.display = "none";
+/* =======================================================================
+   Core refill logic
+   ======================================================================= */
+function requestRefill(id) {
+  const rxs = loadData("prescriptions");
+  const rx  = rxs.find(r => r.id === id && r.patientName === PATIENT);
+
+  if (!rx)             { showError("Prescription not found."); return; }
+  if (rx.refills <= 0) { showError("No refills left.");        return; }
+
+  rx.refills--;
+  saveData("prescriptions", rxs);
+
+  logAction(`Refill requested | Rx=${id} | patient`);
+  showInfo("Refill requested.");
+  renderTableAndDropdown();
 }
 
-function displayError(msg) {
-  errorMessage.style.display = "block";
-  errorMessage.innerText = msg;
-  infoMessage.style.display = "none";
-}
+/* =======================================================================
+   Helpers
+   ======================================================================= */
+function showInfo (m){ infoMsg.innerText = m; infoMsg.style.display = "block"; errMsg.style.display = "none"; }
+function showError(m){ errMsg .innerText = m; errMsg .style.display = "block"; infoMsg.style.display = "none"; }

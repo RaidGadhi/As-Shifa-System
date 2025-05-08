@@ -1,0 +1,117 @@
+/*
+  register.css
+  Mirrors the clean glass‑panel look from login.css
+  – same gradient background & overlay for consistent branding
+*/
+
+/* Reset & font */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Nunito", sans-serif;
+  }
+  
+  /* Background */
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #141E30, #243B55);
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Radial swirl overlay */
+  .background-overlay {
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    top: -100%;
+    left: -100%;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 70%
+    );
+    animation: swirl 20s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  @keyframes swirl {
+    0%   { transform: rotate(0deg);   }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Glass panel */
+  .glass-panel {
+    position: relative;
+    z-index: 2;
+    width: 90%;
+    max-width: 430px;
+    padding: 2rem;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    animation: fadeInUp 0.7s ease forwards;
+    transform: translateY(20px);
+    opacity: 0;
+    color: #222;
+  }
+  
+  /* Titles */
+  .app-title    { font-size: 2rem;  margin-bottom: .3rem; color:#111; letter-spacing:1px; }
+  .app-subtitle { font-size: 1rem;  margin-bottom: 1.5rem; color:#333; }
+  
+  /* Inputs */
+  .input-container { margin-bottom: 1rem; text-align:left; color:#222; }
+  .input-container label {
+    display:block; margin-bottom:.3rem; font-size:.9rem; letter-spacing:.5px;
+    font-weight:600; color:#111;
+  }
+  .input-container input {
+    width:100%; padding:.65rem .8rem; border:1px solid #ccc; border-radius:6px;
+    font-size:1rem; outline:none; transition:box-shadow .3s ease;
+    color:#222; background:#fdfdfd;
+  }
+  .input-container input:focus { box-shadow:0 0 6px rgba(0,0,0,.2); }
+  
+  /* Buttons */
+  .button-row {
+    display:flex; justify-content:space-between; margin-top:1.2rem;
+  }
+  .btn {
+    background:#2b90d9; color:#fff; border:none; font-size:.95rem;
+    padding:.6rem 1.2rem; border-radius:25px; cursor:pointer;
+    transition:background .3s ease, transform .2s ease;
+  }
+  .btn:hover  { background:#0077cc; transform:translateY(-2px); }
+  .btn:active { transform:scale(.98); }
+  
+  .btn.outline {
+    background:transparent; color:#2b90d9; border:2px solid #2b90d9;
+  }
+  .btn.outline:hover { background:#2b90d9; color:#fff; }
+  
+  /* Messages */
+  .message { margin-top:1rem; padding:.6rem; border-radius:8px; font-size:.9rem; }
+  .error-message { background:rgba(255,0,0,.1);  color:#c0392b; }
+  .info-message  { background:rgba(0,0,0,.05);  color:#444; }
+  
+  /* Fade In Up */
+  @keyframes fadeInUp {
+    0% { opacity:0; transform:translateY(40px); }
+    100%{ opacity:1; transform:translateY(0); }
+  }
+  
+  /* Responsive tweak */
+  @media (max-width:480px){
+    .glass-panel { padding:1.5rem; }
+    .app-title   { font-size:1.6rem; }
+  }
+  

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>As‑Shifa | Demo Email Inbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Shared helpers & styling
+       (adjust “../” if your shared.js lives elsewhere)            -->
+  <script src="../shared.js"></script>
+  <link rel="stylesheet" href="fake_email_inbox.css" />
+</head>
+<body>
+
+  <div class="background-overlay"></div>
+
+  <div class="canvas">
+    <h1 class="title">📨 Demo Email Inbox</h1>
+    <p class="subtitle">
+      Enter the email (or username) you used during login/registration
+      to view the 2‑factor code that was just “sent”.
+    </p>
+
+    <form id="checkForm" class="inner-card">
+      <input id="emailInput" type="text" placeholder="Email or Username" required />
+      <button type="submit" class="btn">Check Inbox</button>
+    </form>
+
+    <div id="resultCard" class="inner-card" style="display:none;">
+      <p id="resultText"></p>
+    </div>
+
+    <button id="backButton" class="link-btn">← Back to Login</button>
+  </div>
+
+  <script src="fake_email_inbox.js"></script>
+</body>
+</html>

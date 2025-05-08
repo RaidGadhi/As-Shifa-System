@@ -3,6 +3,7 @@
   - Reads ?role= from the query (doctor, staff, or patient)
   - Renders the advanced dashboard
   - Adds Profile & Help pop-ups, plus Home link logic
+  - Adds direct session timeout logic (warn at 30s, logout at 60s)
 */
 
 /** DOM references */
@@ -41,48 +42,87 @@ window.onload = () => {
 
   // Setup nav link events
   homeLink.addEventListener("click", () => {
-    // Reload the same page with the same role param (like going "home")
     window.location.href = `index.html?role=${userRole}`;
   });
 
   profileLink.addEventListener("click", () => {
-    // Show profile modal
     profileModal.style.display = "flex";
   });
 
   helpLink.addEventListener("click", () => {
-    // Show help modal
     helpModal.style.display = "flex";
   });
 
-  // Close modals
   closeProfileModal.addEventListener("click", () => {
     profileModal.style.display = "none";
   });
+
   closeHelpModal.addEventListener("click", () => {
     helpModal.style.display = "none";
   });
 
-  // If user clicks outside the modal, close it
   profileModal.addEventListener("click", (e) => {
-    if (e.target === profileModal) {
-      profileModal.style.display = "none";
-    }
-  });
-  helpModal.addEventListener("click", (e) => {
-    if (e.target === helpModal) {
-      helpModal.style.display = "none";
-    }
+    if (e.target === profileModal) profileModal.style.display = "none";
   });
 
-  // Logout event
+  helpModal.addEventListener("click", (e) => {
+    if (e.target === helpModal) helpModal.style.display = "none";
+  });
+
   logoutButton.addEventListener("click", () => {
     window.location.href = "../login/login.html";
   });
+
+  /* ===================== IDLE TIMEOUT SECTION ===================== */
+  let idleTime = 0;
+  const warnAfter = 30;  // seconds
+  const logoutAfter = 60; // seconds
+
+  function resetIdle() {
+    idleTime = 0;
+    const modal = document.getElementById("sessionWarningModal");
+    if (modal) modal.style.display = "none";
+  }
+
+  function showWarningModal() {
+    if (!document.getElementById("sessionWarningModal")) {
+      const div = document.createElement("div");
+      div.id = "sessionWarningModal";
+      div.style.cssText = `
+        position:fixed;inset:0;display:flex;justify-content:center;align-items:center;
+        background:rgba(0,0,0,.4);z-index:9999;font-family:Nunito,Arial`;
+      div.innerHTML = `
+        <div style="background:#fff;padding:1.5rem 2rem;border-radius:10px;
+                    max-width:320px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.3);">
+          <h3 style="margin-top:0;">Are you still there?</h3>
+          <p>You will be logged out soon due to inactivity.</p>
+          <button style="padding:.5rem 1.2rem;background:#2b90d9;color:#fff;
+                         border:none;border-radius:20px;cursor:pointer"
+                  onclick="document.getElementById('sessionWarningModal').style.display='none'; idleTime=0;">
+            Stay Logged In
+          </button>
+        </div>`;
+      document.body.appendChild(div);
+    } else {
+      document.getElementById("sessionWarningModal").style.display = "flex";
+    }
+  }
+
+  setInterval(() => {
+    idleTime++;
+    if (idleTime === warnAfter) showWarningModal();
+    if (idleTime >= logoutAfter) {
+      window.location.href = "../login/login.html";
+    }
+  }, 1000);
+
+  ["mousemove", "keydown", "click", "scroll", "touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetIdle, { passive: true });
+  });
 };
 
+/* ----------------------------------------------------------------- */
 function renderDashboard(role) {
-  // Hide all role panels initially
   doctorSection.style.display = "none";
   staffSection.style.display = "none";
   patientSection.style.display = "none";
@@ -113,8 +153,6 @@ function renderDashboard(role) {
       break;
 
     default:
-      // If invalid role, redirect to login
       window.location.href = "../login/login.html";
-      break;
   }
 }

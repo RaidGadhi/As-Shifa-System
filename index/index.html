@@ -5,6 +5,7 @@
   <title>As-Shifa - Dashboard</title>
   <link rel="stylesheet" href="index.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../shared.js"></script>
 </head>
 <body>
 
@@ -119,6 +120,19 @@
       <p>Need assistance? Contact our support team or refer to the relevant role-based documentation. This is a placeholder pop-up for demonstration purposes.</p>
     </div>
   </div>
+
   <script src="index.js"></script>
+
+  <!-- Session Monitor -->
+  <script>
+    startSessionMonitor({
+      warnAfter: 30000,          // show warning after 30 s idle
+      logoutAfter: 60000,        // auto-logout after 60 s idle
+      onLogout: () => {
+        localStorage.removeItem("loginState");
+        location.href = "../login/login.html";
+      }
+    });
+  </script>
 </body>
 </html>

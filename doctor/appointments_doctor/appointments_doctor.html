@@ -2,25 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>As-Shifa - Doctor Appointments</title>
-  <link rel="stylesheet" href="appointments_doctor.css" />
+  <title>As‑Shifa | Doctor Appointments</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="appointments_doctor.css" />
+
+  <!-- two levels up → /front-end/shared.js -->
+  <script src="../../shared.js"></script>
 </head>
 <body>
 
-  <!-- Swirling background overlay -->
   <div class="background-overlay"></div>
 
-  <!-- Main Glass Panel -->
   <div class="glass-panel" id="appointmentsContainer">
-
-    <!-- Header Bar -->
     <header class="header-bar">
       <h1>Manage Appointments</h1>
-      <button id="backButton" class="btn outline">Back to Dashboard</button>
+      <button id="backButton" class="btn outline">Back to Dashboard</button>
     </header>
 
-    <!-- Upcoming Appointments Section -->
+    <!-- Upcoming appointments -->
     <section class="appointments-section">
       <h2>Upcoming Appointments</h2>
       <p class="intro-text">Review your scheduled patient visits below.</p>
@@ -28,42 +27,34 @@
       <table id="appointmentsTable">
         <thead>
           <tr>
-            <th>Date &amp; Time</th>
+            <th>Date&nbsp;&amp;&nbsp;Time</th>
             <th>Patient</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Populated by appointments_doctor.js -->
-        </tbody>
+        <tbody><!-- filled by JS --></tbody>
       </table>
     </section>
 
-    <!-- Availability / New Slots Section -->
-    <section class="availability-section">
-      <h2>Adjust Availability</h2>
-      <p class="intro-text">Add or remove available slots so patients can schedule appointments.</p>
-
-      <form id="availabilityForm">
-        <div class="input-row">
-          <label for="availDateTime">Date &amp; Time</label>
-          <input type="datetime-local" id="availDateTime" required />
-        </div>
-
-        <button type="submit" class="btn">Add Availability</button>
-      </form>
-
-      <ul id="availabilityList">
-        <!-- Populated by appointments_doctor.js -->
-      </ul>
-    </section>
-
-    <!-- Info / Error messages -->
-    <p class="message info-message" id="infoMessage" style="display: none;"></p>
-    <p class="message error-message" id="errorMessage" style="display: none;"></p>
+    <!-- Info / error messages -->
+    <p id="infoMessage"  class="message info-message"  style="display:none;"></p>
+    <p id="errorMessage" class="message error-message" style="display:none;"></p>
   </div>
 
+  <!-- Session monitor (shared.js already loaded) -->
+  <script>
+    startSessionMonitor({
+      warnAfter:   30000,
+      logoutAfter: 60000,
+      onLogout() {
+        localStorage.removeItem("loginState");
+        location.href = "../../login/login.html";
+      }
+    });
+  </script>
+
+  <!-- Page logic (plain JS, no imports) -->
   <script src="appointments_doctor.js"></script>
 </body>
 </html>
